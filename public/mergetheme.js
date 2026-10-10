@@ -516,6 +516,11 @@ tp-yt-paper-dialog, ytmusic-settings-page {
   border-radius: 12px !important;
 }
 
+/* Do not clip dismissable info-card content when its dialog has not sized yet. */
+tp-yt-paper-dialog:has(ytmusic-dismissable-dialog-renderer) {
+  overflow: visible !important;
+}
+
 /* Xoá đường viền đen chia 2 bảng cài đặt */
 ytmusic-setting-category-collection-renderer.ytmusic-settings-page {
   border-left: none !important;
