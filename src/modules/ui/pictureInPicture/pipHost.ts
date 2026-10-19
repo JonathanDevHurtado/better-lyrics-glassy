@@ -1,21 +1,39 @@
-import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
+import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS, PLAYER_TIME_EVENT } from "@constants";
+import type { PlayerDetails } from "@core/appState";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
+import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
+import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
+import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
+import { shouldShowWindowStage } from "@modules/karaoke/gate";
+import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
+import { getPlayerVideo, isAdPlaying, isVideoModeShown } from "@modules/ui/playerControls/playerBarControls";
 import {
-  createLyricsRenderer,
-  injectRomanization,
-  injectTranslation,
-  type Lyric,
-  type LyricsRenderer,
-} from "@braccato/core";
-import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
-import { PictureInPictureController } from "./controller";
-import { PictureInPictureLyricsView } from "./lyricsView";
-import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
-import type { PictureInPictureHostEnvironment } from "./types";
+  onLyrics,
+  onLyricsSynced,
+  type PictureInPictureLyricsPayload,
+  type PictureInPictureLyricsSynced,
+} from "@modules/ui/pictureInPicture/bridge";
+import { PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
+import { PictureInPictureLyricsView } from "@modules/ui/pictureInPicture/lyricsView";
+import { createPictureInPictureLyricsHost } from "@modules/ui/pictureInPicture/pipLyricsHost";
+import type { PictureInPictureHostEnvironment } from "@modules/ui/pictureInPicture/types";
+import { createVideoMirror, type VideoMirror } from "@modules/ui/pictureInPicture/videoMirror";
+import {
+  expectsSyncedLyrics,
+  fitWindowSize,
+  formatWindowFrame,
+  measureWindowFrame,
+  parseWindowFrame,
+  type WindowSize,
+  withWindowFrame,
+} from "@modules/ui/pictureInPicture/windowSize";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 const STYLESHEET_REVEAL_TIMEOUT_MS = 1000;
+const WINDOW_FRAME_STORAGE_KEY = "blyrics-pip-window-frame";
+const NO_WINDOW_FRAME: WindowSize = { width: 0, height: 0 };
+const WINDOW_FRAME_SETTLE_MS = 1000;
 
 // Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
 // from moz-extension:// into a window of the page's own origin. An unregistered custom property
@@ -42,6 +60,14 @@ function hasSameLines(left: readonly Lyric[] | null, right: readonly Lyric[] | n
   );
 }
 
+function hasTimedLyrics(payload: PictureInPictureLyricsPayload | null): boolean {
+  return payload !== null && !payload.noLyrics && payload.syncType !== "none" && (payload.lyrics?.length ?? 0) > 0;
+}
+
+function suitsStage(payload: PictureInPictureLyricsPayload | null): boolean {
+  return hasTimedLyrics(payload) || payload?.noLyrics === true;
+}
+
 function hasSameNames(left: readonly string[] = [], right: readonly string[] = []): boolean {
   return left.length === right.length && left.every((name, index) => name === right[index]);
 }
@@ -60,11 +86,14 @@ function whenStylesheetSettled(link: HTMLLinkElement): Promise<void> {
   return settlement;
 }
 
-function revealWhenStyled(pipWindow: Window): void {
+function revealWhenStyled(pipWindow: Window, onStyled: () => void): void {
   const links = Array.from(pipWindow.document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'));
   const timeout = new Promise<void>(resolve => pipWindow.setTimeout(resolve, STYLESHEET_REVEAL_TIMEOUT_MS));
-  void Promise.race([Promise.all(links.map(whenStylesheetSettled)), timeout]).then(() => {
+  const styled = Promise.all(links.map(whenStylesheetSettled));
+  void Promise.race([styled.then(() => true), timeout.then(() => false)]).then(isStyled => {
     pipWindow.document.documentElement.style.removeProperty("visibility");
+    onStyled();
+    if (!isStyled) void styled.then(onStyled);
   });
 }
 
@@ -105,13 +134,119 @@ export function createPictureInPictureHost(
 ): PictureInPictureController<Window> {
   let activeView: PictureInPictureLyricsView | null = null;
   let activeRenderer: LyricsRenderer | null = null;
+  let activeStage: KaraokeStage | null = null;
+  let isStageShown = false;
+  let isRescrollPending = false;
+  let activeMirror: VideoMirror | null = null;
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
   let builtSongwriters: readonly string[] | undefined;
   let clonedFooterSource: Element | null = null;
+  let buildCount = 0;
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
+  let isQualityBoosted = false;
+  let syncedLyricsFlag: PictureInPictureLyricsSynced | null = null;
+  let playerVideoId: string | null = null;
+  let windowFrame = readStoredWindowFrame();
+  let requestedSize: WindowSize | null = null;
+
+  function contentWindowSize(syncedLyrics: boolean): WindowSize {
+    const video = getPlayerVideo(document);
+    return fitWindowSize({
+      layout: environment.windowLayout(),
+      videoEnabled: environment.videoEnabled() !== false,
+      videoMode: isVideoModeShown(document),
+      adPlaying: isAdPlaying(document),
+      videoWidth: video?.videoWidth ?? 0,
+      videoHeight: video?.videoHeight ?? 0,
+      karaokeEnabled: environment.karaokeEnabled() !== false,
+      syncedLyrics,
+    });
+  }
+
+  function openingWindowSize(): WindowSize {
+    return contentWindowSize(
+      expectsSyncedLyrics({
+        flag: syncedLyricsFlag,
+        currentVideoId: playerVideoId,
+        karaokeEnabled: environment.karaokeEnabled() !== false,
+        videoMode: isVideoModeShown(document),
+      })
+    );
+  }
+
+  const liveWindowSize = (): WindowSize => contentWindowSize(suitsStage(lyricsPayload));
+
+  // -- Window frame --------------------------------------------
+
+  function readStoredWindowFrame(): WindowSize {
+    try {
+      return parseWindowFrame(window.localStorage.getItem(WINDOW_FRAME_STORAGE_KEY)) ?? NO_WINDOW_FRAME;
+    } catch (error) {
+      environment.view.log("floating window frame could not be read", error);
+      return NO_WINDOW_FRAME;
+    }
+  }
+
+  function requestWindowSize(): WindowSize {
+    requestedSize = withWindowFrame(openingWindowSize(), windowFrame);
+    return requestedSize;
+  }
+
+  function storeWindowFrame(frame: WindowSize): void {
+    windowFrame = frame;
+    try {
+      window.localStorage.setItem(WINDOW_FRAME_STORAGE_KEY, formatWindowFrame(frame));
+    } catch (error) {
+      environment.view.log("floating window frame could not be stored", error);
+    }
+  }
+
+  function learnWindowFrame(pipWindow: Window): void {
+    if (!requestedSize) return;
+    const requested: WindowSize = requestedSize;
+    requestedSize = null;
+
+    const deadline = pipWindow.performance.now() + WINDOW_FRAME_SETTLE_MS;
+    let frameRequest: number | null = null;
+    const stop = (): void => {
+      pipWindow.removeEventListener("resize", check);
+      if (frameRequest !== null) pipWindow.cancelAnimationFrame(frameRequest);
+      frameRequest = null;
+    };
+    function check(): void {
+      if (activeWindow !== pipWindow) {
+        stop();
+        return;
+      }
+      const frame = measureWindowFrame(
+        requested,
+        { width: pipWindow.innerWidth, height: pipWindow.innerHeight },
+        { width: pipWindow.screen.availWidth, height: pipWindow.screen.availHeight }
+      );
+      if (frame && (frame.width > 0 || frame.height > 0)) {
+        stop();
+        storeWindowFrame(frame);
+        return;
+      }
+      if (pipWindow.performance.now() >= deadline) {
+        stop();
+        return;
+      }
+      if (frameRequest !== null) pipWindow.cancelAnimationFrame(frameRequest);
+      frameRequest = pipWindow.requestAnimationFrame(check);
+    }
+    pipWindow.addEventListener("resize", check);
+    frameRequest = pipWindow.requestAnimationFrame(check);
+  }
+
+  function setQualityBoost(next: boolean): void {
+    if (next === isQualityBoosted) return;
+    isQualityBoosted = next;
+    document.dispatchEvent(new CustomEvent(VIDEO_QUALITY_BOOST_EVENT, { detail: JSON.stringify(next) }));
+  }
 
   function stopStyleMirror(): void {
     styleObserver?.disconnect();
@@ -143,6 +278,8 @@ export function createPictureInPictureHost(
       // Recorded only once it is applied. A guard written first would go on claiming a theme that
       // threw on the way in, and nothing else in the window's life reads that stylesheet again.
       const needsLyricRebuild = renderer.setTheme(css);
+      activeStage?.setTheme(css);
+      activeView?.syncStageTextScale();
       appliedThemeCss = css;
       return needsLyricRebuild;
     };
@@ -191,7 +328,7 @@ export function createPictureInPictureHost(
   /**
    * Builds the window's own lyrics DOM from the lines that crossed the bridge.
    */
-  function buildLyrics(): void {
+  function buildLyrics(animate = false): void {
     const view = activeView;
     const renderer = activeRenderer;
     if (!view || !renderer) return;
@@ -199,26 +336,88 @@ export function createPictureInPictureHost(
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
     builtSongwriters = lyricsPayload?.songwriters;
-    // The container the copy hung off is about to go, so the next sync makes a fresh one.
-    clonedFooterSource = null;
+    const build = ++buildCount;
 
     if (!lines || lines.length === 0) {
-      renderer.clear();
-      view.showSearching();
+      clonedFooterSource = null;
+      const showLoader = (): void => {
+        view.showSearching(animate);
+        renderer.clear();
+        activeStage?.clear();
+      };
+      if (!animate || !view.holdLyrics(showLoader)) showLoader();
       return;
     }
 
-    renderer.setLyrics([...lines], {
-      mount: view.prepareLyricsMount(),
-      loaderVisible: false,
-      noLyrics: lyricsPayload?.noLyrics === true,
-      language: lyricsPayload?.language,
-      songwriters: lyricsPayload?.songwriters,
+    const payload = lyricsPayload;
+    const videoId = view.videoId;
+    const mount = view.prepareLyricsMount(animate);
+    const mountLyrics = (): void => {
+      if (build !== buildCount || activeView !== view) return;
+      if (videoId !== null && view.videoId !== videoId) {
+        builtLines = null;
+        view.showSearching();
+        renderer.clear();
+        activeStage?.clear();
+        return;
+      }
+      // The container the copy hung off is about to go, so the next sync makes a fresh one.
+      clonedFooterSource = null;
+      renderer.setLyrics([...lines], {
+        mount,
+        loaderVisible: false,
+        noLyrics: payload?.noLyrics === true,
+        language: payload?.language,
+        songwriters: payload?.songwriters,
+      });
+      buildStage(payload);
+      applyDecorations();
+      syncSourceFooter();
+      // The decorations and the footer both land after the build measured itself, and both add height.
+      measureLyrics();
+      if (animate) {
+        tickLyrics(false);
+        view.revealLyrics(renderer.container);
+      }
+    };
+
+    if (animate) view.afterNextFrame(mountLyrics);
+    else mountLyrics();
+  }
+
+  function buildStage(payload: PictureInPictureLyricsPayload | null): void {
+    const stage = activeStage;
+    if (!stage) return;
+    if (!payload?.lyrics || !hasTimedLyrics(payload)) {
+      stage.clear();
+      return;
+    }
+    stage.build({
+      lyrics: [...payload.lyrics],
+      language: payload.language,
+      songwriters: payload.songwriters,
+      title: payload.title,
+      artist: payload.artist,
+      providerKey: payload.providerKey,
     });
-    applyDecorations();
-    syncSourceFooter();
-    // The decorations and the footer both land after the build measured itself, and both add height.
-    measureLyrics();
+    stage.setVisible(isStageShown, relayoutStage);
+  }
+
+  function relayoutStage(): void {
+    activeStage?.relayout();
+  }
+
+  function syncStageVisibility(view: PictureInPictureLyricsView): void {
+    const shown = shouldShowWindowStage({
+      enabled: environment.karaokeEnabled() !== false,
+      videoState: activeMirror?.state ?? "off",
+      synced: suitsStage(lyricsPayload),
+    });
+    if (shown === isStageShown) return;
+    isStageShown = shown;
+    if (!shown) isRescrollPending = true;
+    view.setStageActive(shown);
+    activeStage?.setVisible(shown, relayoutStage);
   }
 
   /**
@@ -246,37 +445,14 @@ export function createPictureInPictureHost(
   }
 
   /**
-   * Hangs the translated and romanized text the opener fetched off this window's own line elements.
    * Run after every build rather than only when the payload changes, because a theme change rebuilds
-   * the lyrics from scratch and would otherwise drop them. Both injectors no-op on a line that
-   * already carries one, so re-running costs a lookup per line.
+   * the lyrics from scratch and would otherwise drop them.
    */
   function applyDecorations(): void {
-    const renderer = activeRenderer;
-    // The container is built out of the renderer's own document, so it names it. Reading it off
-    // `activeWindow` instead makes this depend on two variables, assigned in two other functions,
-    // staying in step.
-    const pipDocument = renderer?.container?.ownerDocument;
     const decorations = lyricsPayload?.decorations;
-    if (!renderer || !pipDocument || !decorations) return;
-
-    const lines = renderer.lines;
-    for (const [index, decoration] of Object.entries(decorations)) {
-      const line = lines[Number(index)];
-      if (!line) continue;
-      if (decoration.romanization) {
-        injectRomanization(
-          pipDocument,
-          line.lyricElement,
-          line,
-          decoration.romanization,
-          decoration.timedRomanization ?? null
-        );
-      }
-      if (decoration.translation) {
-        injectTranslation(pipDocument, line.lyricElement, decoration.translation, decoration.translationLanguage);
-      }
-    }
+    if (!activeRenderer || !decorations) return;
+    applyLyricDecorations(activeRenderer, decorations);
+    if (hasTimedLyrics(lyricsPayload)) activeStage?.applyDecorations(decorations, () => tickLyrics(false));
   }
 
   function measureLyrics(): void {
@@ -288,11 +464,14 @@ export function createPictureInPictureHost(
    * panel's driver does. Nothing here reads the opener's document: the snapshot and the seek are
    * the only two things that still cross.
    */
-  function tickLyrics(): void {
+  function tickLyrics(smoothScroll = true): void {
     const view = activeView;
     const renderer = activeRenderer;
     if (!view || !renderer) return;
     applySettings(view);
+    activeMirror?.refresh();
+    if (activeMirror?.state === "ad") view.setIntermission(activeMirror.adRemainingS());
+    syncStageVisibility(view);
 
     const payload = lyricsPayload;
     const snapshot = view.playbackSnapshot;
@@ -307,16 +486,24 @@ export function createPictureInPictureHost(
     // the window to the first line and back. The side panel's driver drops the same frames.
     if (currentTime === 0 && wallTime < payload.suppressZeroTimeUntil) return;
 
-    renderer.tick(currentTime, {
+    const tickOptions = {
       eventCreationTime: wallTime,
       isPlaying: snapshot.isPlaying,
-      smoothScroll: true,
+      smoothScroll,
       globalLyricOffset: payload.globalLyricOffset,
       lyricOffset: payload.lyricOffset,
       richsyncOffsetTrim: payload.richsyncOffsetTrim,
       lineOffsetTrim: payload.lineOffsetTrim,
       passiveScrollEnabled: payload.passiveScrollEnabled,
-    });
+    };
+    if (isStageShown) activeStage?.tick(currentTime, tickOptions);
+    if (isRescrollPending) {
+      isRescrollPending = false;
+      measureLyrics();
+      renderer.tick(currentTime, { ...tickOptions, smoothScroll: false });
+      return;
+    }
+    renderer.tick(currentTime, tickOptions);
   }
 
   function stopSyncLoop(pipWindow: Window): void {
@@ -341,16 +528,27 @@ export function createPictureInPictureHost(
 
   // Subscribed once rather than per window: the opener publishes the current lyrics as soon as it is
   // told the window opened, which is before the view that renders them exists.
+  const unsubscribeLyricsSynced = onLyricsSynced(flag => {
+    syncedLyricsFlag = flag;
+  });
+
+  const trackPlayerVideo = (event: Event): void => {
+    const videoId = (event as CustomEvent<PlayerDetails | null>).detail?.videoId;
+    if (videoId) playerVideoId = videoId;
+  };
+  document.addEventListener(PLAYER_TIME_EVENT, trackPlayerVideo);
+
   const unsubscribeLyrics = onLyrics(payload => {
     lyricsPayload = payload;
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
     // window is animating and restart the line it is part way through. A theme change republishes
     // them too, and the rebuild that one wants is decided where the theme arrives instead.
     if (!hasSameLines(builtLines, payload.lyrics) || !hasSameNames(builtSongwriters, payload.songwriters)) {
-      buildLyrics();
+      buildLyrics(activeView?.isSwitchingMode !== true);
       return;
     }
     activeRenderer?.setLanguage(payload.language);
+    activeStage?.setLanguage(payload.language);
     // A translation or romanization batch lands on the same lines, so nothing above rebuilds and
     // the new text has to be hung off the DOM that is already up. The lines grow, so re-measure.
     applyDecorations();
@@ -359,17 +557,49 @@ export function createPictureInPictureHost(
 
   function renderLoadingShell(pipWindow: Window): void {
     activeWindow = pipWindow;
+    learnWindowFrame(pipWindow);
     pipWindow.document.documentElement.style.visibility = "hidden";
     document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
     environment.onOpened();
     pipWindow.document.title = environment.windowTitle();
     registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
-    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
+    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view, liveWindowSize);
+    const view = activeView;
+    activeMirror = createVideoMirror({
+      sourceDocument: document,
+      isEnabled: () => environment.videoEnabled() !== false,
+      onChange: (state, track) => view.setVideo(state, track),
+      onModeFlip: expectsVideo => view.noteModeFlip(expectsVideo),
+      onQualityBoost: setQualityBoost,
+      get log() {
+        return environment.view.log;
+      },
+    });
+    const mirror = activeMirror;
+    view.onVideoStall(() => mirror.recapture());
+    view.onStageTextScaleChange(relayoutStage);
+    pipWindow.document.fonts.addEventListener("loadingdone", relayoutStage);
+    activeStage = createKaraokeStage({
+      doc: pipWindow.document,
+      win: pipWindow,
+      overlay: {
+        doc: pipWindow.document,
+        mountParent: view.stageParent,
+        writtenByLabel: environment.view.translate("lyrics_writtenBy"),
+        bar: view.stageBar,
+        onCardChange: (card, heightPx) => view.setStageCard(card, heightPx),
+      },
+      isVisible: () => isStageShown,
+      isAdPlaying: () => isAdPlaying(document),
+      get log() {
+        return environment.view.log;
+      },
+    });
     activeRenderer = createLyricsRenderer({
       document: pipWindow.document,
       window: pipWindow,
-      host: createPictureInPictureLyricsHost(activeView, environment.view),
+      host: createPictureInPictureLyricsHost(activeView, environment.view, () => isStageShown),
     });
     // After the renderer, because the theme is applied through it, and before the build below,
     // which reads the settings that theme declares.
@@ -386,6 +616,13 @@ export function createPictureInPictureHost(
     environment.onClosed();
     stopSyncLoop(pipWindow);
     stopStyleMirror();
+    activeMirror?.destroy();
+    activeMirror = null;
+    setQualityBoost(false);
+    activeStage?.destroy();
+    activeStage = null;
+    isStageShown = false;
+    isRescrollPending = false;
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;
@@ -398,12 +635,16 @@ export function createPictureInPictureHost(
 
   return new PictureInPictureController<Window>({
     host: window,
-    windowLayout: environment.windowLayout,
+    windowSize: requestWindowSize,
     loadStylesheet: environment.loadStylesheet,
     renderLoadingShell,
     injectStylesheet: (pipWindow, stylesheet) => {
       environment.injectStylesheet(pipWindow, stylesheet);
-      revealWhenStyled(pipWindow);
+      revealWhenStyled(pipWindow, () => {
+        if (activeWindow !== pipWindow) return;
+        activeView?.syncStageTextScale();
+        measureLyrics();
+      });
     },
     closeWindow: pipWindow => {
       teardownWindow(pipWindow);
@@ -419,6 +660,10 @@ export function createPictureInPictureHost(
         { once: true }
       ),
     reportFailure: environment.reportFailure,
-    dispose: unsubscribeLyrics,
+    dispose: () => {
+      unsubscribeLyrics();
+      unsubscribeLyricsSynced();
+      document.removeEventListener(PLAYER_TIME_EVENT, trackPlayerVideo);
+    },
   });
 }

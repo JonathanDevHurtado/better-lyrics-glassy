@@ -31,14 +31,6 @@
     "message": "Стиль",
     "description": "Themes settings tab label"
   },
-  "options_general_title": {
-    "message": "Головні налаштування",
-    "description": "General settings section title"
-  },
-  "options_general_description": {
-    "message": "Налаштування роботи Better Lyrics.",
-    "description": "General settings section description"
-  },
   "options_general_showLogs": {
     "message": "Показати логи",
     "description": "Show logs setting label"
@@ -47,9 +39,13 @@
     "message": "Автоперехід на вкладку з текстами",
     "description": "Auto switch to lyrics tab setting label"
   },
-  "options_general_cache": {
-    "message": "Кеш-пам’ять",
-    "description": "Cache section label"
+  "options_general_clearCachedLyrics": {
+    "message": "Очистити кеш текстів",
+    "description": "Label for the clear cache action row"
+  },
+  "options_general_clearCachedLyricsHint": {
+    "message": "Вони завантажаться повторно при відтворенні",
+    "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
     "message": "Очистити",
@@ -59,17 +55,43 @@
     "message": "Усього текстів у кеші",
     "description": "Total lyrics in cache label"
   },
-  "options_general_cacheSize": {
-    "message": "Обсяг кеш-пам’яті",
-    "description": "Cache size label"
+  "options_general_storageUsed": {
+    "message": "Використано сховища",
+    "description": "Popup General tab: label under the total local storage size"
   },
-  "options_display_title": {
-    "message": "Налаштування відображення",
-    "description": "Display settings section title"
+  "options_general_segment": {
+    "message": "$LABEL$: $VALUE$",
+    "description": "Popup General tab: tooltip on one segment of a breakdown bar, e.g. 'Syllable: 120' or 'Themes: 0.4 MB'",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Syllable"
+      },
+      "value": {
+        "content": "$2",
+        "example": "120"
+      }
+    }
   },
-  "options_display_description": {
-    "message": "Налаштуйте зовнішній вигляд Better Lyrics.",
-    "description": "Display settings section description"
+  "options_general_browseThemes": {
+    "message": "Переглянути теми",
+    "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
+  },
+  "options_general_whatsNew": {
+    "message": "Що нового",
+    "description": "Popup General tab: shortcut to the latest release notes"
+  },
+  "options_general_whatsNewHint": {
+    "message": "Список останніх змін",
+    "description": "Popup General tab: one-line description on the What's new shortcut"
+  },
+  "options_display_fullscreenTab": {
+    "message": "Повноекранний",
+    "description": "Header tab in Display for fullscreen settings"
+  },
+  "options_display_videoTab": {
+    "message": "Відео",
+    "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
     "message": "Вимкнути повноекранний режим",
@@ -94,6 +116,14 @@
   "options_display_letterWave": {
     "message": "Хвилювання літер",
     "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveOff": {
+    "message": "Вимкнено",
+    "description": "Spoken value of the letter wave three-way switch when the effect is off"
+  },
+  "options_display_letterWaveOn": {
+    "message": "Увімкнено",
+    "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
     "message": "Експеримент",
@@ -127,9 +157,27 @@
     "message": "Призупинити",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_fitWindow": {
+    "message": "Fit window",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
+  },
   "picture_in_picture_next": {
     "message": "Далі",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_adPlaying": {
+    "message": "Ad playing",
+    "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
+  },
+  "picture_in_picture_adUpNext": {
+    "message": "Then $SONG$",
+    "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Never Gonna Give You Up"
+      }
+    }
   },
   "options_display_pipEnabled": {
     "message": "Увімкнути плавуче вікно",
@@ -144,15 +192,15 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "Макет вікна",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "Горизонтальний",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "Вертикальний",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
@@ -194,6 +242,10 @@
   "options_display_pipProgressBar": {
     "message": "Показувати смужку прогресу",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
+  },
+  "options_display_pipVideo": {
+    "message": "Show music video",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
     "message": "Показати посилання на Better Lyrics Shaders",
@@ -319,14 +371,6 @@
     "message": "Автоматично",
     "description": "Option label for automatic language detection based on browser settings"
   },
-  "options_language_title": {
-    "message": "Налаштування мови",
-    "description": "Language settings section title"
-  },
-  "options_language_description": {
-    "message": "Налаштування мови та перекладу для Better Lyrics.",
-    "description": "Language settings section description"
-  },
   "options_language_romanization": {
     "message": "Романізація (транслітерація)",
     "description": "Romanization setting label"
@@ -354,10 +398,6 @@
   "options_themes_title": {
     "message": "Стиль інтерфейсу",
     "description": "Theme settings section title"
-  },
-  "options_themes_description": {
-    "message": "Персоналізуйте зовнішній вигляд від Better Lyrics.",
-    "description": "Theme settings section description"
   },
   "options_themes_theme": {
     "message": "Тема",
@@ -395,17 +435,13 @@
     "message": "Установлені теми",
     "description": "Installed themes button label"
   },
-  "options_identity_title": {
-    "message": "Особисті дані",
-    "description": "Identity settings section title"
+  "options_identity_backupTitle": {
+    "message": "Збережіть свій ідентифікатор",
+    "description": "Title of the identity backup warning"
   },
-  "options_identity_description": {
-    "message": "Ваш унікальний анонімний профіль в Better Lyrics.",
-    "description": "Identity settings section description"
-  },
-  "options_identity_warning": {
-    "message": "Ставтеся до цього, мов це ваш пароль. Ніколи нікому не поширюйте. Створіть резервну копію. Втрачений профіль не можуть відновити навіть адміністратори.",
-    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
+  "options_identity_backupBody": {
+    "message": "Ваші внески та рівень прив'язані до цього ключа. Якщо ви його втратите, ніхто не зможе його відновити, навіть команда Better Lyrics. Ніколи нікому його не передавайте — будь-хто зможе діяти від вашого імені, якщо матиме ваш ідентифікатор.",
+    "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
     "message": "Ваш ідентифікатор",
@@ -481,7 +517,7 @@
   },
   "options_nickname_status_checking": {
     "message": "Перевірка...",
-    "description": "Status while checking nickname availability"
+    "description": "Status while checking nickname availability; shared with the install from URL button while it checks the repository"
   },
   "options_nickname_status_available": {
     "message": "Доступно",
@@ -505,7 +541,7 @@
   },
   "options_nickname_status_saved": {
     "message": "Збережено",
-    "description": "Status when nickname is saved"
+    "description": "Status when a setting or nickname is saved; shared by the popup save status and the editor save toast"
   },
   "options_nickname_status_submitting": {
     "message": "Збереження...",
@@ -518,6 +554,10 @@
   "options_nickname_status_error": {
     "message": "Не вдалося зв’язатися із сервером",
     "description": "Status when nickname request fails"
+  },
+  "options_alert_refreshFailed": {
+    "message": "Не вдалося перезавантажити тексти. Відкрийте YouTube Music і спробуйте ще раз.",
+    "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
     "message": "Спочатку вставте JSON профілю чи виберіть файл.",
@@ -571,6 +611,112 @@
     "message": "Помилка при завантаженні",
     "description": "Identity load error message"
   },
+  "editor_alert_nothingToSave": {
+    "message": "Для збереження теми треба щоб в ній були стилі",
+    "description": "Toast when the user saves an empty editor as a custom theme"
+  },
+  "editor_alert_saveDialogOpened": {
+    "message": "Відкрилося діалогове вікно. Виберіть місце для збереження файлу",
+    "description": "Toast after the browser save dialog opens for an exported theme file"
+  },
+  "editor_alert_downloadStarted": {
+    "message": "Завантаження теми розпочалося. Перевірте каталог для завантажень",
+    "description": "Toast after an exported theme file starts downloading without a save dialog"
+  },
+  "editor_alert_applyFailed": {
+    "message": "Не вдалося застосувати тему",
+    "description": "Toast when applying a built-in or custom theme from the theme picker fails"
+  },
+  "editor_alert_saveFailed": {
+    "message": "Не вдалося зберегти ваші стилі",
+    "description": "Toast when saving the custom CSS editor content fails"
+  },
+  "editor_alert_storageFull": {
+    "message": "Сховище переповнене. Очистьте кеш текстів у налаштуваннях і спробуйте ще раз",
+    "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
+  },
+  "editor_prompt_saveMessage": {
+    "message": "Укажіть назву для цієї теми",
+    "description": "Message in the save as theme dialog"
+  },
+  "editor_prompt_renameMessage": {
+    "message": "Укажіть нову назву для цієї теми",
+    "description": "Message in the rename theme dialog"
+  },
+  "editor_prompt_themeName": {
+    "message": "Назва теми",
+    "description": "Placeholder of the theme name field in the save and rename dialogs"
+  },
+  "editor_prompt_deleteMessage": {
+    "message": "Видалити тему «$NAME$»? Цю дію неможливо скасувати.",
+    "description": "Message in the delete custom theme dialog",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Night drive"
+      }
+    }
+  },
+  "editor_alert_importFailed": {
+    "message": "Не вдалося імпортувати файл теми. Спробуйте ще раз",
+    "description": "Toast when importing a theme file fails"
+  },
+  "editor_alert_imported": {
+    "message": "Імпортовано «$NAME$»",
+    "description": "Toast after a theme file is imported into the editor",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "my-theme.rics"
+      }
+    }
+  },
+  "editor_alert_themeSaved": {
+    "message": "Збережено тему «$NAME$»",
+    "description": "Toast after the editor styles are saved as a custom theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Night drive"
+      }
+    }
+  },
+  "editor_alert_themeSaveFailed": {
+    "message": "Не вдалося зберегти тему",
+    "description": "Toast when saving a custom theme fails"
+  },
+  "editor_alert_themeRenamed": {
+    "message": "Тему перейменовано на «$NAME$»",
+    "description": "Toast after a custom theme is renamed",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Night drive"
+      }
+    }
+  },
+  "editor_alert_themeNameTaken": {
+    "message": "Тема з назвою «$NAME$» вже існує",
+    "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Night drive"
+      }
+    }
+  },
+  "editor_alert_themeRenameFailed": {
+    "message": "Не вдалося перейменувати тему",
+    "description": "Toast when renaming a custom theme fails"
+  },
+  "editor_alert_themeDeleted": {
+    "message": "Користувацьку тему видалено",
+    "description": "Toast after a custom theme is deleted"
+  },
+  "editor_alert_themeDeleteFailed": {
+    "message": "Не вдалося видалити тему",
+    "description": "Toast when deleting a custom theme fails"
+  },
   "options_editor_saving": {
     "message": "Збереження...",
     "description": "Saving indicator text"
@@ -609,15 +755,43 @@
   },
   "options_editor_renameTheme": {
     "message": "Перейменувати користувацьку тему",
-    "description": "Rename theme button title"
+    "description": "Rename theme button title, also the title of the rename theme dialog"
   },
   "options_editor_deleteTheme": {
     "message": "Видалити користувацьку тему",
-    "description": "Delete theme button title"
+    "description": "Delete theme button title, also the title of the delete theme confirm dialog"
   },
   "options_editor_doubleClickRename": {
     "message": "Двічі клацніть, щоб перейменувати",
     "description": "Double-click to rename tooltip"
+  },
+  "options_editor_findReplaceTitle": {
+    "message": "Знайти та замінити",
+    "description": "Title of the modal shown when find and replace is used in the popup editor"
+  },
+  "options_editor_findReplaceFullscreenOnly": {
+    "message": "Функція «Знайти та замінити» доступна лише в повноекранному редакторі.",
+    "description": "Modal body explaining that find and replace needs the fullscreen editor"
+  },
+  "options_editor_findReplaceOpenHint": {
+    "message": "Відкрийте повноекранний редактор, щоб скористатися повним функціоналом.",
+    "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
+  },
+  "options_editor_openFullscreen": {
+    "message": "Відкрити повноекранний редактор",
+    "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
+  },
+  "options_editor_close": {
+    "message": "Закрити",
+    "description": "Cancel button that closes the find and replace modal"
+  },
+  "options_editor_notReady": {
+    "message": "Редактор не ініціалізовано",
+    "description": "Alert shown when an editor action runs before the editor has loaded"
+  },
+  "options_editor_nothingToExport": {
+    "message": "Немає стилів для експорту",
+    "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
@@ -999,6 +1173,64 @@
     "message": "Не вдалося застосувати тему",
     "description": "Theme apply error"
   },
+  "marketplace_alert_installed": {
+    "message": "«$NAME$» установлено",
+    "description": "Toast after a Marketplace theme is installed; it has an Apply action",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "marketplace_alert_installedFrom": {
+    "message": "Установлено «$NAME$» з $SOURCE$",
+    "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      },
+      "source": {
+        "content": "$2",
+        "example": "owner/minimal-theme (dev)"
+      }
+    }
+  },
+  "marketplace_alert_removed": {
+    "message": "«$NAME$» видалено",
+    "description": "Toast after an installed Marketplace theme is removed",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "marketplace_alert_storageFull": {
+    "message": "Сховище переповнене. Видаліть деякі теми та спробуйте ще раз.",
+    "description": "Toast when a theme cannot be installed because extension storage is full"
+  },
+  "marketplace_alert_installFailed": {
+    "message": "Не вдалося встановити «$NAME$»",
+    "description": "Toast when installing a Marketplace theme fails",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "marketplace_alert_removeFailed": {
+    "message": "Не вдалося видалити «$NAME$»",
+    "description": "Toast when removing an installed Marketplace theme fails",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
   "marketplace_noThemesInstalled": {
     "message": "Немає встановлених тем",
     "description": "Empty installed themes message"
@@ -1012,6 +1244,190 @@
         "example": "January 15, 2025, 3:42 PM"
       }
     }
+  },
+  "marketplace_tooltipInstallsSingular": {
+    "message": "1 встановлення",
+    "description": "Tooltip on a theme's install count when it has exactly one install"
+  },
+  "marketplace_byline": {
+    "message": "Від $AUTHOR$ · v$VERSION$",
+    "description": "Byline under a theme name: its creators and version",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "drago-oo"
+      },
+      "version": {
+        "content": "$2",
+        "example": "1.3.0"
+      }
+    }
+  },
+  "marketplace_themeActiveLabel": {
+    "message": "«$TITLE$», активна",
+    "description": "Accessible name of the currently applied theme in the installed themes menu",
+    "placeholders": {
+      "title": {
+        "content": "$1",
+        "example": "Lucid"
+      }
+    }
+  },
+  "marketplace_tooltipInstalls": {
+    "message": "Установлень: $COUNT$",
+    "description": "Tooltip on a theme's install count",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1204"
+      }
+    }
+  },
+  "marketplace_tooltipRating": {
+    "message": "Середня оцінка: $AVERAGE$ (усього оцінок — $COUNT$)",
+    "description": "Tooltip on a theme's star rating",
+    "placeholders": {
+      "average": {
+        "content": "$1",
+        "example": "4.8"
+      },
+      "count": {
+        "content": "$2",
+        "example": "52"
+      }
+    }
+  },
+  "marketplace_tooltipOlderBuild": {
+    "message": "Ваша версія — v$CURRENT$. Останньою версією є v$LATEST$",
+    "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
+    "placeholders": {
+      "current": {
+        "content": "$1",
+        "example": "1.2.0"
+      },
+      "latest": {
+        "content": "$2",
+        "example": "1.4.0"
+      }
+    }
+  },
+  "marketplace_tooltipOlderBuildFloor": {
+    "message": "Ваша версія — v$CURRENT$. Остання версія (v$LATEST$) потребує Better Lyrics $FLOOR$+",
+    "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
+    "placeholders": {
+      "current": {
+        "content": "$1",
+        "example": "1.2.0"
+      },
+      "latest": {
+        "content": "$2",
+        "example": "1.4.0"
+      },
+      "floor": {
+        "content": "$3",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "marketplace_installedFrom": {
+    "message": "Установлено з $REPO$",
+    "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
+    "placeholders": {
+      "repo": {
+        "content": "$1",
+        "example": "owner/theme"
+      }
+    }
+  },
+  "marketplace_ricsBadge": {
+    "message": "Ця тема використовує RICS",
+    "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
+  },
+  "marketplace_urlValidating": {
+    "message": "Перевірка...",
+    "description": "Install button text while a theme repository URL is being checked"
+  },
+  "marketplace_urlInstalling": {
+    "message": "Установлення...",
+    "description": "Install button text while a theme from a repository URL is being installed"
+  },
+  "marketplace_incompatibleConfirm": {
+    "message": "Ця тема потребує Better Lyrics v$VERSION$+ і може не працювати на вашій версії. Усе одно встановити?",
+    "description": "Confirm dialog before installing a theme that needs a newer extension version",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "marketplace_sortDescendingLabel": {
+    "message": "$LABEL$, у порядку спадання. Клацніть, щоб змінити порядок.",
+    "description": "Accessible label of the selected sort chip when sorting in descending order",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Highest rated"
+      }
+    }
+  },
+  "marketplace_sortAscendingLabel": {
+    "message": "$LABEL$, у порядку зростання. Клацніть, щоб змінити порядок.",
+    "description": "Accessible label of the selected sort chip when sorting in ascending order",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Lowest rated"
+      }
+    }
+  },
+  "unison_sortAscendingClearLabel": {
+    "message": "$LABEL$, у порядку зростання. Клацніть, щоб скасувати сортування.",
+    "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Most votes"
+      }
+    }
+  },
+  "marketplace_emptyStore": {
+    "message": "Немає доступних тем. Спробуйте пізніше",
+    "description": "Shown when the Marketplace registry has no themes"
+  },
+  "marketplace_loadFailed": {
+    "message": "Не вдалося завантажити теми. Перевірте з'єднання та спробуйте ще раз",
+    "description": "Shown when the Marketplace theme list fails to load"
+  },
+  "marketplace_ratedAs": {
+    "message": "Ваша оцінка — $RATING$/5 (під ім'ям $NAME$)",
+    "description": "Status under the rating stars after the user rated a theme",
+    "placeholders": {
+      "rating": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "GoldenCymbalCoast"
+      }
+    }
+  },
+  "marketplace_ratingSubmitting": {
+    "message": "Надсилання...",
+    "description": "Status while a theme rating is being sent"
+  },
+  "marketplace_ratingVerifying": {
+    "message": "Перевірка...",
+    "description": "Status while the rating anti-abuse check runs"
+  },
+  "marketplace_ratingVerifyFailed": {
+    "message": "Перевірку не пройдено. Спробуйте ще раз",
+    "description": "Status when the rating anti-abuse check fails"
+  },
+  "marketplace_urlInvalid": {
+    "message": "Неправильне посилання на GitHub. Використовуйте github.com/user/repo чи github.com/user/repo/tree/branch",
+    "description": "Error in the install from URL dialog when the URL is not a GitHub repository"
   },
   "marketplace_requiresVersion": {
     "message": "Необхідно v$version$+",
@@ -1124,7 +1540,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
-    "message": "Written by",
+    "message": "Автори:",
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
@@ -1139,9 +1555,143 @@
     "message": "Винятки мов",
     "description": "Label for language exclusions setting"
   },
-  "options_manage": {
-    "message": "Налаштувати",
-    "description": "Manage button label"
+  "options_about": {
+    "message": "Про розширення",
+    "description": "Footer button that opens the About page"
+  },
+  "options_about_tagline": {
+    "message": "Синхронізовані тексти пісень для YouTube Music.",
+    "description": "About page tagline under the product name"
+  },
+  "options_about_whatHeading": {
+    "message": "Що це",
+    "description": "About page section heading"
+  },
+  "options_about_whatBody": {
+    "message": "Better Lyrics покращує ваш досвід користування YouTube Music за допомогою гарних синхронізованих текстів для ваших улюблених пісень.",
+    "description": "About page section body"
+  },
+  "options_about_doesHeading": {
+    "message": "Що воно робить",
+    "description": "About page section heading"
+  },
+  "options_about_does1": {
+    "message": "Тексти, які слідують за піснею. Клацніть на рядок, щоб перейти до нього.",
+    "description": "About page feature list item"
+  },
+  "options_about_does2": {
+    "message": "Переклад і романізація пісень іншими мовами.",
+    "description": "About page feature list item"
+  },
+  "options_about_does3": {
+    "message": "Повноекранний режим і плавуче вікно з текстами.",
+    "description": "About page feature list item"
+  },
+  "options_about_does4": {
+    "message": "Unison: будь-хто зі спільноти може пропонувати, голосувати й виправляти тексти.",
+    "description": "About page feature list item"
+  },
+  "options_about_does5": {
+    "message": "Теми з магазину тем, або ж власні, створені у вбудованому редакторі.",
+    "description": "About page feature list item"
+  },
+  "options_about_does6": {
+    "message": "Тексти з багатьох джерел, у порядку, який налаштовуєте ви.",
+    "description": "About page feature list item"
+  },
+  "options_about_openSourceHeading": {
+    "message": "Відкритий код",
+    "description": "About page section heading"
+  },
+  "options_about_openSourceBody": {
+    "message": "GPL v3. Джерельний код на $GITHUB$. Будемо раді PR, якщо ви знайдете щось, що треба виправити.",
+    "description": "About page body; $GITHUB$ becomes a link to the repository",
+    "placeholders": {
+      "github": {
+        "content": "$1",
+        "example": "GitHub"
+      }
+    }
+  },
+  "options_about_communityHeading": {
+    "message": "Спільнота",
+    "description": "About page section heading"
+  },
+  "options_about_communityDiscord": {
+    "message": "$DISCORD$ для запитань і спілкування.",
+    "description": "About page list item; $DISCORD$ becomes a link to the Discord server",
+    "placeholders": {
+      "discord": {
+        "content": "$1",
+        "example": "Discord"
+      }
+    }
+  },
+  "options_about_communityIssue": {
+    "message": "$ISSUE$, якщо щось зламане.",
+    "description": "About page list item; $ISSUE$ becomes a link to the issue tracker",
+    "placeholders": {
+      "issue": {
+        "content": "$1",
+        "example": "File an issue"
+      }
+    }
+  },
+  "options_about_fileIssue": {
+    "message": "Створіть Issue",
+    "description": "Link text in the About page that opens the issue tracker"
+  },
+  "options_about_discordLink": {
+    "message": "Discord",
+    "description": "Link text in the About page that opens the Discord server"
+  },
+  "options_about_supportHeading": {
+    "message": "Підтримка проєкту",
+    "description": "About page heading for the donation links"
+  },
+  "options_about_supportBody": {
+    "message": "Better Lyrics — це проєкт, створений з любов'ю, і ми приділяємо йому набагато більше уваги, ніж хотілося б це визнавати... Це безкоштовне розширення, без реклами та відстеження, і таким завжди залишатиметься. Якщо воно хоч трохи покращило ваш досвід прослуховування — ви можете допомогти нам і надалі розвивати його! Зірочка на GitHub теж допоможе, і це безкоштовно :)",
+    "description": "About page note above the donation links, written in the makers' own voice"
+  },
+  "options_about_supportStar": {
+    "message": "Поставити зірочку на GitHub",
+    "description": "About page link to star the Better Lyrics repository on GitHub"
+  },
+  "options_about_supportCoffee": {
+    "message": "Почастувати нас кавою",
+    "description": "About page link to the Buy Me a Coffee page"
+  },
+  "options_about_supportSponsors": {
+    "message": "Спонсорувати на GitHub",
+    "description": "About page link to GitHub Sponsors"
+  },
+  "options_about_madeByHeading": {
+    "message": "Автори",
+    "description": "About page section heading"
+  },
+  "options_about_madeByBody": {
+    "message": "$BOIDU$ та $ADALIE$, також дякуємо перекладачам і всім учасникам спільноти Better Lyrics, які тестували розширення, повідомляли про помилки та надсилали тексти пісень!",
+    "description": "About page credits; the names become links",
+    "placeholders": {
+      "boidu": {
+        "content": "$1",
+        "example": "Boidu"
+      },
+      "adalie": {
+        "content": "$2",
+        "example": "Adalie"
+      }
+    }
+  },
+  "options_about_badgesBody": {
+    "message": "Особлива подяка $KIYOSHI$ за час і турботу, вкладені в створення кожного значка для Better Lyrics і Unison <3",
+    "description": "About page credit for the Unison badge artist; the name becomes a link",
+    "placeholders": {
+      "kiyoshi": {
+        "content": "$1",
+        "example": "Kiyoshi"
+      }
+    }
   },
   "options_language_exclusionsTitle": {
     "message": "Винятки мов",
@@ -1149,7 +1699,7 @@
   },
   "options_romanization_tab": {
     "message": "Транслітерація",
-    "description": "Romanization tab label"
+    "description": "Romanization tab label in options, and the romanized lyrics option in the Unison preview language picker"
   },
   "options_translation_tab": {
     "message": "Переклад",
@@ -1158,6 +1708,18 @@
   "options_searchLanguages": {
     "message": "Пошук...",
     "description": "Search input placeholder"
+  },
+  "ui_close": {
+    "message": "Закрити",
+    "description": "Accessible label and button text that closes a dialog"
+  },
+  "ui_dropdownSearch": {
+    "message": "Пошук",
+    "description": "Placeholder for the search box inside a long dropdown menu"
+  },
+  "ui_dropdownNoResults": {
+    "message": "Нічого не знайдено",
+    "description": "Shown inside a dropdown menu when the search matches no option"
   },
   "options_romanization_hint": {
     "message": "Клацніть, щоб увімкнути або вимкнути. Транслітерація не буде застосовуватись.",
@@ -1221,7 +1783,7 @@
   },
   "builtin_applied": {
     "message": "Застосовано тему: $NAME$",
-    "description": "Alert after successfully applying a bundled built-in theme",
+    "description": "Toast after applying a built-in, custom or installed theme",
     "placeholders": {
       "name": {
         "content": "$1",
@@ -1387,6 +1949,30 @@
     "message": "Шукати пісні, виконавців чи тексти...",
     "description": "Search input placeholder"
   },
+  "unison_searchResults": {
+    "message": "«$query$» · Результатів: $count$",
+    "description": "Search result count shown at the end of the Feed / My Submissions tab row",
+    "placeholders": {
+      "query": {
+        "content": "$1",
+        "example": "love"
+      },
+      "count": {
+        "content": "$2",
+        "example": "20"
+      }
+    }
+  },
+  "unison_searchResultsOne": {
+    "message": "«$query$» · 1 результат",
+    "description": "Search result count when there is exactly one result",
+    "placeholders": {
+      "query": {
+        "content": "$1",
+        "example": "love"
+      }
+    }
+  },
   "unison_submit": {
     "message": "Подати текст",
     "description": "Submit lyrics button text"
@@ -1425,7 +2011,7 @@
   },
   "unison_delete": {
     "message": "Видалити",
-    "description": "Delete button label on a user's own Unison submission card"
+    "description": "Generic delete button label, used on Unison submission cards and destructive confirm dialogs"
   },
   "unison_deleteConfirm": {
     "message": "Дійсно видалити?",
@@ -1640,15 +2226,15 @@
     "description": "Hint text below video ID field label"
   },
   "unison_additionalVideos": {
-    "message": "Additional videos",
+    "message": "Додаткові відео",
     "description": "Label for the optional submit-form field where the user lists other videos of the same song to link to this lyric"
   },
   "unison_additionalVideosHint": {
-    "message": "Optional. Other uploads of this song to link, videoIds or URLs separated by spaces or commas. Each is verified; ones that don't match are skipped.",
+    "message": "Необов’язково. Ідентифікатори відео або посилання на інші версії цієї після, розділені пробілами або комами. Кожна з них перевіряється — ті, що не збігаються, пропускатимуться.",
     "description": "Hint text below the additional videos field on the submit form"
   },
   "unison_additionalVideosSkipped": {
-    "message": "Submitted, but these videos weren't linked: $videos$",
+    "message": "Подано, але ці відео не прив'язані: $videos$",
     "description": "Feedback after submitting when some additional videos could not be linked. $videos$ is a comma-separated list of videoIds",
     "placeholders": {
       "videos": {
@@ -1658,11 +2244,11 @@
     }
   },
   "unison_additionalVideosInvalid": {
-    "message": "Some additional videos aren't valid video IDs or URLs. Fix or remove them to submit.",
+    "message": "Деякі додаткові відео мають недійсні ідентифікатори або посилання. Виправте їх або видаліть, щоб подати.",
     "description": "Error shown on submit when the additional videos field contains entries that are not valid YouTube video IDs or URLs"
   },
   "unison_viewSubmittedLyrics": {
-    "message": "View lyrics",
+    "message": "Подивитися текст",
     "description": "Button in the submit feedback that opens the lyric that was just submitted, shown when some additional videos could not be linked"
   },
   "unison_formatHint": {
@@ -1677,6 +2263,10 @@
     "message": "інструменту пошуку ISRC",
     "description": "Link text for ISRC finder"
   },
+  "unison_feedTabsLabel": {
+    "message": "Списки текстів",
+    "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"
+  },
   "unison_tabFeed": {
     "message": "Стрічка",
     "description": "Feed tab label for recent submissions"
@@ -1688,6 +2278,10 @@
   "unison_noSubmissions": {
     "message": "Ви ще не подали жодних текстів пісень.",
     "description": "Empty state for my submissions tab"
+  },
+  "unison_emptyMineHint": {
+    "message": "Тексти пісень, подані вами, з'являтимуться тут.",
+    "description": "Second line of the empty My Submissions tab, under the title and above the submit button"
   },
   "unison_noFilterResults": {
     "message": "Відсутні тексти пісень, які відповідають вашим фільтрам",
@@ -1838,11 +2432,11 @@
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_changePicture": {
-    "message": "Change picture",
+    "message": "Змінити аватарку",
     "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
   },
   "unison_addPicture": {
-    "message": "Add a picture",
+    "message": "Поставити аватарку",
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
@@ -1862,39 +2456,39 @@
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   },
   "unison_linkedVideos": {
-    "message": "Linked videos",
+    "message": "Пов'язані відео",
     "description": "Heading for the list of YouTube videos a Unison lyric is linked to, on the lyric detail page"
   },
   "unison_noLinkedVideos": {
-    "message": "No linked videos yet",
+    "message": "Немає пов'язаних відео",
     "description": "Shown under the linked-videos heading when a lyric has no linked videos"
   },
   "unison_videoPrimary": {
-    "message": "Primary",
+    "message": "Основне",
     "description": "Badge marking the primary (home) video of a Unison lyric, which cannot be unlinked"
   },
   "unison_removeVideo": {
-    "message": "Remove",
+    "message": "Вилучити",
     "description": "Button that unlinks a video from a Unison lyric"
   },
   "unison_suggestedVideos": {
-    "message": "Suggested videos",
+    "message": "Пропоновані відео",
     "description": "Heading for the list of videos Unison suggests linking to a lyric"
   },
   "unison_noMatchingVideos": {
-    "message": "No matching videos found",
+    "message": "Не знайдено подібностей",
     "description": "Suggested videos list when every suggestion is judged a different recording; those stay behind the other versions toggle below it"
   },
   "unison_noSuggestions": {
-    "message": "No suggestions right now",
+    "message": "Немає пропозицій",
     "description": "Shown under the suggested-videos heading when Unison has no suggestions"
   },
   "unison_linkConfirmTitle": {
-    "message": "Link this video?",
+    "message": "Пов'язати це відео?",
     "description": "Title of the confirmation shown before linking a suggested video whose title differs from the lyric's song title"
   },
   "unison_linkConfirmBody": {
-    "message": "\"$video$\" isn't titled exactly \"$song$\". Check it's the same recording before linking, since remixes, live and sped-up versions usually need their own lyrics.",
+    "message": "«$video$» називається не «$song$». Перш ніж пов'язувати, переконайтеся, що це той самий запис, оскільки ремікси, концертні та прискорені версії зазвичай потребують окремих текстів.",
     "description": "Body of the confirmation before linking a suggested video. $video$ is the suggested video's title, $song$ is the lyric's song title",
     "placeholders": {
       "video": {
@@ -1908,31 +2502,39 @@
     }
   },
   "unison_addVideo": {
-    "message": "Add",
+    "message": "Додати",
     "description": "Button that links a suggested video to a Unison lyric"
   },
+  "unison_linkVideoPlaceholder": {
+    "message": "Ідентифікатор відео або посилання",
+    "description": "Placeholder and accessible label for the input on a Unison lyric's detail page where the owner types a videoId or YouTube URL to link"
+  },
+  "unison_linkVideoInvalid": {
+    "message": "Це не дійсні ідентифікатор або посилання",
+    "description": "Error shown when the owner tries to link a video whose ID or URL can't be parsed"
+  },
   "unison_linkFailed": {
-    "message": "Couldn't link this video",
+    "message": "Не вдалося пов'язати це відео",
     "description": "Generic error shown when linking a video to a Unison lyric fails"
   },
   "unison_unlinkFailed": {
-    "message": "Couldn't remove this video",
+    "message": "Не вдалося вилучити це відео",
     "description": "Generic error shown when unlinking a video from a Unison lyric fails"
   },
   "unison_suggestMatchSameHint": {
-    "message": "Likely the same recording",
+    "message": "Імовірно, той самий запис",
     "description": "Tooltip and accessible label for the lightbulb icon on a suggested video judged to be the same recording as the lyric; also marks videos added to the additional videos field automatically"
   },
   "unison_suggestMatchRelated": {
-    "message": "Might be a different version. Check before adding",
+    "message": "Можливо інша версія. Перевірте перед додаванням",
     "description": "Tooltip and accessible label for the question mark icon on a suggested video that may be a different version of the song (an edit or variant), asking the user to check before linking"
   },
   "unison_suggestMatchDifferentHint": {
-    "message": "A different version, or another song",
+    "message": "Інша версія або інша пісня",
     "description": "Tooltip and accessible label for the layers icon on a suggested video judged to be a different recording of the song, such as a remix or live version"
   },
   "unison_suggestOtherVersions": {
-    "message": "Show $count$ other versions",
+    "message": "Показати інші версії ($count$)",
     "description": "Toggle that reveals suggested videos judged to be different recordings, such as remixes or live versions. $count$ is how many are hidden",
     "placeholders": {
       "count": {
@@ -1942,35 +2544,35 @@
     }
   },
   "unison_suggestHideOtherVersions": {
-    "message": "Hide other versions",
+    "message": "Приховати інші версії",
     "description": "Label of the other versions toggle while it is open; clicking it hides the suggested videos judged to be different recordings again"
   },
   "unison_videosLoadFailed": {
-    "message": "Couldn't load videos",
+    "message": "Не вдалося завантажити відео",
     "description": "Shown in place of the linked or suggested videos list when Unison could not load it; a retry button follows"
   },
   "unison_showMore": {
-    "message": "Show more",
+    "message": "Показати більше",
     "description": "Button that reveals the rest of the suggested videos list beyond the first few"
   },
   "unison_error_linkCapReached": {
-    "message": "Link limit reached for this lyric",
+    "message": "Досягнуто ліміту посилань для цього тексту",
     "description": "Error shown when a lyric already has the maximum number of linked videos"
   },
   "unison_error_durationMismatch": {
-    "message": "That video's length doesn't match",
+    "message": "Довжина цього відео не збігається",
     "description": "Error shown when a video cannot be linked because its duration differs too much from the lyric"
   },
   "unison_error_videoUnverifiable": {
-    "message": "That video couldn't be verified",
+    "message": "Це відео не вдалося перевірити",
     "description": "Error shown when a video cannot be linked because Unison could not fetch it"
   },
   "unison_error_cannotUnlinkPrimary": {
-    "message": "The primary video can't be removed",
+    "message": "Основне відео не може бути видалене",
     "description": "Error shown when the user tries to unlink the primary video of a lyric"
   },
   "unison_rev_number": {
-    "message": "Revision $rev$",
+    "message": "Редакція $rev$",
     "description": "Revision label. $rev$ is the revision number",
     "placeholders": {
       "rev": {
@@ -1980,11 +2582,11 @@
     }
   },
   "unison_rev_original": {
-    "message": "Original",
-    "description": "Label for revision 1 of a Unison lyric, the original upload"
+    "message": "Оригінал",
+    "description": "Label for revision 1 of a Unison lyric (the original upload), and for the untranslated lyrics option in the preview language picker"
   },
   "unison_rev_neverEdited": {
-    "message": "Uploaded $when$, never edited",
+    "message": "Вивантажено $when$, не змінювалося",
     "description": "Revision bar text for a lyric with no edits. $when$ is a relative time",
     "placeholders": {
       "when": {
@@ -1994,7 +2596,7 @@
     }
   },
   "unison_rev_editedAgo": {
-    "message": "Edited $when$",
+    "message": "Змінено $when$",
     "description": "Revision bar text for the live revision. $when$ is a relative time",
     "placeholders": {
       "when": {
@@ -2004,7 +2606,7 @@
     }
   },
   "unison_rev_pendingChip": {
-    "message": "Revision $rev$ pending",
+    "message": "Очікується затвердження редакції $rev$",
     "description": "Chip for an edit waiting for council review",
     "placeholders": {
       "rev": {
@@ -2014,79 +2616,79 @@
     }
   },
   "unison_rev_revisions": {
-    "message": "Revisions",
+    "message": "Редакції",
     "description": "Button and page title for the list of a lyric's revisions"
   },
   "unison_rev_editLyrics": {
-    "message": "Edit lyrics",
+    "message": "Редагувати текст",
     "description": "Button that opens the lyric editor"
   },
   "unison_rev_viewChanges": {
-    "message": "View changes",
+    "message": "Переглянути зміни",
     "description": "Button that opens the diff of the pending edit, and link in the editor save bar that opens the Changes tab"
   },
   "unison_rev_changes": {
-    "message": "Changes",
+    "message": "Зміни",
     "description": "Editor tab that lists what the edit changes compared with an earlier revision"
   },
   "unison_rev_changesTabs": {
-    "message": "Preview or changes",
+    "message": "Попередній перегляд або зміни",
     "description": "Screen reader label for the editor tabs that switch between the lyric preview and the list of changes"
   },
   "unison_rev_details": {
-    "message": "Details",
+    "message": "Деталі",
     "description": "Diff section label above changed song details: language, ISRC and album"
   },
   "unison_rev_updating": {
-    "message": "Updating",
+    "message": "Оновлення",
     "description": "Shown while the list of changes refreshes after an edit"
   },
   "unison_rev_checkFailed": {
-    "message": "Couldn't check your edit",
+    "message": "Не вдалося перевірити ваші зміни",
     "description": "Editor save bar title when the edit check failed for a reason the server did not explain"
   },
   "unison_rev_checkFailedHint": {
-    "message": "Save turns back on once the check runs.",
+    "message": "Функція збереження з'явиться після перевірки.",
     "description": "Editor save bar hint under the failed check title, followed by a Try again link"
   },
   "unison_rev_tryAgain": {
-    "message": "Try again",
+    "message": "Спробувати ще раз",
     "description": "Link or button that runs the edit check again after it failed"
   },
   "unison_rev_changesError": {
-    "message": "Couldn't load changes",
+    "message": "Не вдалося завантажити зміни",
     "description": "Error title in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesErrorHint": {
-    "message": "Something went wrong. Your draft is safe, and the preview still works.",
+    "message": "Сталася помилка. Ваша чернетка збережена, а попередній перегляд все ще працює.",
     "description": "Error hint in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesNeedParse": {
-    "message": "Changes return once the lyrics parse.",
+    "message": "Вкладка «Зміни» з'явиться після аналізу тексту.",
     "description": "Editor Changes tab while the lyrics have errors that stop them from being read"
   },
   "unison_rev_withdraw": {
-    "message": "Withdraw",
+    "message": "Відкликати",
     "description": "Button that withdraws a pending edit before the council reviews it"
   },
   "unison_rev_reason_sealed": {
-    "message": "Sealed lyric",
+    "message": "Текст було запечатано раніше",
     "description": "Why an edit needs council review: the council approved (sealed) this lyric"
   },
   "unison_rev_reason_flagged": {
-    "message": "Flagged for review",
+    "message": "Позначено для перевірки",
     "description": "Why an edit needs council review: an automatic check flagged it"
   },
   "unison_rev_reason_largeText": {
-    "message": "Large text change",
+    "message": "Велика зміна тексту",
     "description": "Why an edit needs council review: too much of the text changed"
   },
   "unison_rev_reason_largeTiming": {
-    "message": "Large timing change",
+    "message": "Велика зміна часових проміжків",
     "description": "Why an edit needs council review: too much of the timing changed"
   },
   "unison_rev_goesToReview": {
-    "message": "Goes to council review: $reason$",
+    "message": "Підлягає перевірці радою: $reason$",
     "description": "Editor outcome before saving. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2096,7 +2698,7 @@
     }
   },
   "unison_rev_pendingTitle": {
-    "message": "Waiting for council review: $reason$",
+    "message": "Очікується перевірка радою: $reason$",
     "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2106,7 +2708,7 @@
     }
   },
   "unison_rev_staysLive": {
-    "message": "Revision $rev$ stays live until the council decides.",
+    "message": "Редакція $rev$ залишатиметься чинною до прийняття рішення радою.",
     "description": "Names the revision listeners keep seeing during review",
     "placeholders": {
       "rev": {
@@ -2116,7 +2718,7 @@
     }
   },
   "unison_rev_rejectedTitle": {
-    "message": "Revision $rev$ was rejected",
+    "message": "Редакцію $rev$ було відхилено",
     "description": "Title when the council rejected an edit",
     "placeholders": {
       "rev": {
@@ -2126,7 +2728,7 @@
     }
   },
   "unison_rev_councilNote": {
-    "message": "Council note: “$note$”",
+    "message": "Примітка ради: «$note$»",
     "description": "The note the council left when it rejected an edit",
     "placeholders": {
       "note": {
@@ -2136,47 +2738,47 @@
     }
   },
   "unison_rev_sealedHint": {
-    "message": "Every edit goes to council review before it goes live.",
+    "message": "Кожна зміна перевіряється радою перед публікацією.",
     "description": "Explains what editing a sealed lyric means"
   },
   "unison_rev_status_live": {
-    "message": "Live",
+    "message": "Чинна версія",
     "description": "Revision status: the version listeners see"
   },
   "unison_rev_status_pending": {
-    "message": "Pending",
+    "message": "На розгляді",
     "description": "Revision status: waiting for council review"
   },
   "unison_rev_status_past": {
-    "message": "Past",
+    "message": "Попередня версія",
     "description": "Revision status: was live before"
   },
   "unison_rev_status_superseded": {
-    "message": "Superseded",
+    "message": "Замінено",
     "description": "Revision status: replaced by a newer save before review"
   },
   "unison_rev_status_rejected": {
-    "message": "Rejected",
+    "message": "Відхилено",
     "description": "Revision status: the council rejected it"
   },
   "unison_rev_status_withdrawn": {
-    "message": "Withdrawn",
+    "message": "Відкликано",
     "description": "Revision status: the owner withdrew it"
   },
   "unison_rev_anchor": {
-    "message": "Anchor",
+    "message": "Якір",
     "description": "Chip on the revision that edits are measured against"
   },
   "unison_rev_approved": {
-    "message": "Approved by the council",
+    "message": "Схвалено радою",
     "description": "Revisions list reason for a council-approved revision"
   },
   "unison_rev_withinLimits": {
-    "message": "Within limits",
+    "message": "У межах ліміту",
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to revision $rev$",
+    "message": "Повернуто до редакції $rev$",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2186,7 +2788,7 @@
     }
   },
   "unison_rev_driftValues": {
-    "message": "Text $text$% · Timing $timing$%",
+    "message": "Текст $text$% · Часові проміжки $timing$%",
     "description": "How much text and timing an edit changed, as whole numbers",
     "placeholders": {
       "text": {
@@ -2200,27 +2802,27 @@
     }
   },
   "unison_rev_colStatus": {
-    "message": "Status",
+    "message": "Стан",
     "description": "Revisions list column header"
   },
   "unison_rev_colChange": {
-    "message": "Change",
+    "message": "Зміна",
     "description": "Revisions list column header (noun): how much an edit changed"
   },
   "unison_rev_colReason": {
-    "message": "Reason",
+    "message": "Причина",
     "description": "Revisions list column header"
   },
   "unison_rev_colWhen": {
-    "message": "When",
+    "message": "Коли",
     "description": "Revisions list column header: relative time"
   },
   "unison_rev_revision": {
-    "message": "Revision",
+    "message": "Редакція",
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with revision $rev$",
+    "message": "У порівнянні з редакцією $rev$",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2230,19 +2832,37 @@
     }
   },
   "unison_rev_legendAdded": {
-    "message": "Added",
+    "message": "Додано",
     "description": "Diff legend: added lines or words"
   },
   "unison_rev_legendRemoved": {
-    "message": "Removed",
+    "message": "Вилучено",
     "description": "Diff legend: removed lines or words"
   },
   "unison_rev_legendTiming": {
-    "message": "Timing only",
+    "message": "Лише часові проміжки",
     "description": "Diff legend: lines whose timing changed but text did not"
   },
+  "unison_rev_syllablesRetimed": {
+    "message": "Зміна часу складів: $count$",
+    "description": "Diff note: how many syllables of a line moved while the line start stayed",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "unison_rev_syllableTimingAdded": {
+    "message": "Додано час складів",
+    "description": "Diff note: a line that had only line timing now has syllable timing"
+  },
+  "unison_rev_syllableTimingRemoved": {
+    "message": "Прибрано час складів",
+    "description": "Diff note: a line that had syllable timing now has only line timing"
+  },
   "unison_rev_unchangedLines": {
-    "message": "Unchanged lines: $count$",
+    "message": "Незмінені рядки: $count$",
     "description": "Collapsed part of a diff",
     "placeholders": {
       "count": {
@@ -2252,15 +2872,15 @@
     }
   },
   "unison_rev_headSection": {
-    "message": "Translations, romanization and credits",
+    "message": "Переклади, романізація й автори",
     "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
   },
   "unison_rev_headCredits": {
-    "message": "Credits",
+    "message": "Автори",
     "description": "Diff row label for a changed credit, such as a songwriter or singer name"
   },
   "unison_rev_headLine": {
-    "message": "line $line$",
+    "message": "рядок $line$",
     "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
     "placeholders": {
       "line": {
@@ -2270,15 +2890,15 @@
     }
   },
   "unison_rev_noDiff": {
-    "message": "No changes to show",
+    "message": "Нічого показувати",
     "description": "Diff area when there is nothing to compare"
   },
   "unison_rev_revertToThis": {
-    "message": "Revert to this",
+    "message": "Повернутися до цієї редакції",
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as revision $rev$",
+    "message": "Повернення редакції $rev$ застосується одразу",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2288,11 +2908,11 @@
     }
   },
   "unison_rev_revertCheckFailed": {
-    "message": "Couldn't check whether reverting goes live or to council review",
+    "message": "Не вдалося визначити, чи повернення застосується одразу, чи буде перевірятися радою",
     "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as revision $rev$",
+    "message": "Повернення редакції $rev$ буде перевірятися радою",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
@@ -2302,11 +2922,11 @@
     }
   },
   "unison_rev_locked": {
-    "message": "Song and artist can't be edited.",
+    "message": "Не можна змінювати назву і виконавця.",
     "description": "Editor note about fields that are locked"
   },
   "unison_rev_editsLeft": {
-    "message": "$remaining$ of $limit$ edits left today",
+    "message": "Залишилося змін на сьогодні: $remaining$/$limit$",
     "description": "Edits left in the last 24 hours",
     "placeholders": {
       "remaining": {
@@ -2320,15 +2940,15 @@
     }
   },
   "unison_rev_textChanged": {
-    "message": "Text changed",
+    "message": "Зміни тексту",
     "description": "Meter label: how much of the text changed"
   },
   "unison_rev_timingChanged": {
-    "message": "Timing changed",
+    "message": "Зміни часових проміжків",
     "description": "Meter label: how much of the timing changed"
   },
   "unison_rev_textChangedSince": {
-    "message": "Text changed since revision $rev$",
+    "message": "Змінено тексту в порівнянні з редакцією $rev$",
     "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2338,7 +2958,7 @@
     }
   },
   "unison_rev_timingChangedSince": {
-    "message": "Timing changed since revision $rev$",
+    "message": "Змінено часових проміжків у порівнянні з редакцією $rev$",
     "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2348,7 +2968,7 @@
     }
   },
   "unison_rev_ofLimit": {
-    "message": "of $limit$% limit",
+    "message": "від ліміту в $limit$%",
     "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
     "placeholders": {
       "limit": {
@@ -2358,7 +2978,7 @@
     }
   },
   "unison_rev_checkLine": {
-    "message": "Line $line$: $message$",
+    "message": "Рядок $line$: $message$",
     "description": "A server check message tied to a line. $message$ comes from the server",
     "placeholders": {
       "line": {
@@ -2372,35 +2992,63 @@
     }
   },
   "unison_rev_checking": {
-    "message": "Checking your edit...",
+    "message": "Перевірка змін...",
     "description": "Editor status while the server checks the edit"
   },
   "unison_rev_fixErrors": {
-    "message": "Fix the errors to save",
+    "message": "Виправте помилки, щоб зберегти",
     "description": "Editor status when the edit has errors"
   },
   "unison_rev_limitReached": {
-    "message": "Edit limit reached",
+    "message": "Досягнуто ліміту змін",
     "description": "Shown when the daily edit limit is used up"
   },
   "unison_rev_noChanges": {
-    "message": "No changes from the live revision",
+    "message": "Без змін у порівнянні з поточною редакцією",
     "description": "Shown when an edit or revert would change nothing"
   },
   "unison_rev_goesLive": {
-    "message": "Goes live when you save",
+    "message": "Застосується після збереження",
     "description": "Editor status when the edit skips review"
   },
   "unison_rev_submitForReview": {
-    "message": "Submit for review",
+    "message": "Відправити на перевірку",
     "description": "Save button label when the edit needs review"
   },
   "unison_rev_noEdits": {
-    "message": "No edits yet",
+    "message": "Поки що немає змін",
     "description": "Revisions page notice for a lyric that was never edited"
   },
   "unison_rev_error": {
-    "message": "Something went wrong. Try again.",
+    "message": "Щось пішло не так. Спробуйте ще раз.",
     "description": "Fallback error for revision actions"
+  },
+  "options_display_karaoke": {
+    "message": "Субтитри-караоке",
+    "description": "Toggle label for showing synced lyrics as subtitles over a music video in fullscreen"
+  },
+  "options_display_highResolutionVideo": {
+    "message": "Увімкнути відео з вищою роздільністю",
+    "description": "Display settings toggle for enabling video resolutions above 1080p."
+  },
+  "options_display_highResolutionVideoInfo": {
+    "message": "Розблоковує роздільність вище 1080p, якщо вона доступна. Може вплинути на плавність переходів між відео. Безперервне відтворення аудіо зберігається. Вимикайте цю опцію лише в разі виникнення проблем із відтворенням або переходами.",
+    "description": "Help tooltip explaining higher video resolutions and the possible effect on seamless video transitions."
+  },
+  "options_display_preferredVideoQuality": {
+    "message": "Бажана якість відео",
+    "description": "Display settings label for the preferred video resolution selector."
+  },
+  "options_display_videoQualityLimit": {
+    "message": "Увімкніть відео з вищою роздільністю: 1440p, 4K і 8K.",
+    "description": "Hint shown when resolutions above 1080p are disabled by the higher-resolution video toggle."
+  },
+  "options_display_videoQualityAuto": {
+    "message": "Автоматично",
+    "description": "Video quality choice that lets YouTube Music select the resolution automatically."
+  },
+  "options_display_videoQualityApplyHint": {
+    "message": "Зміни роздільності на вищу застосуються до наступного відео або після оновлення сторінки. Ця опція вибирає найближчу доступну роздільність в меншу сторону.",
+    "description": "Tooltip explaining when video playback changes take effect and how unavailable resolutions fall back."
   }
 }

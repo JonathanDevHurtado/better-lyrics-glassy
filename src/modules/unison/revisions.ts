@@ -1,6 +1,6 @@
 import { UNISON_REVISION_PREVIEW_RETRY_MAX_MS, UNISON_REVISION_PREVIEW_RETRY_MS } from "@constants";
-import { getLanguageDisplayName } from "@core/i18n";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
+import { languageName } from "@modules/unison/languageNames";
 import type {
   DiffHead,
   DiffRow,
@@ -9,6 +9,7 @@ import type {
   PreviewResult,
   RevisionStatus,
   RevisionSummary,
+  SyllableChange,
 } from "@modules/unison/types";
 
 // -- Messages --------------------------
@@ -153,7 +154,7 @@ export function countDiffChanges(rows: DiffRow[]): number {
 
 function fieldValueText(field: FieldDiffRow["field"], value: string): string {
   if (field !== "language") return value;
-  const name = getLanguageDisplayName(value);
+  const name = languageName(value);
   return name === value ? value : `${name} (${value})`;
 }
 
@@ -177,10 +178,35 @@ export function fieldChange(row: FieldDiffRow): {
   };
 }
 
+interface SyllableLine {
+  kind: "del" | "add" | "timing";
+  content: string;
+  note: RevisionMessage | null;
+}
+
+export type SyllableLineChange = SyllableChange & { text: string };
+
+function syllableNote(row: SyllableLineChange): RevisionMessage | null {
+  if (row.before === null) return message("unison_rev_syllableTimingAdded");
+  if (row.after === null) return message("unison_rev_syllableTimingRemoved");
+  return row.moved > 0 ? message("unison_rev_syllablesRetimed", row.moved) : null;
+}
+
+export function syllableChange(row: SyllableLineChange): SyllableLine[] {
+  const before = row.before ?? row.text;
+  const after = row.after ?? row.text;
+  const note = syllableNote(row);
+  if (before === after) return [{ kind: "timing", content: after, note }];
+  return [
+    { kind: "del", content: before, note: null },
+    { kind: "add", content: after, note },
+  ];
+}
+
 export function diffHeadLabel(head: DiffHead): RevisionMessage[] {
   const label = [message(HEAD_KIND_KEY[head.kind])];
   if (head.kind === "credit") return label;
-  if (head.lang) label.push({ text: getLanguageDisplayName(head.lang) });
+  if (head.lang) label.push({ text: languageName(head.lang) });
   if (head.line !== null) label.push(message("unison_rev_headLine", head.line));
   return label;
 }

@@ -7,6 +7,7 @@ import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
 import { clearSongCache } from "@core/storage";
 import { logError } from "@core/logger";
+import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 
 export interface PlayerDetails {
   currentTime: number;
@@ -57,6 +58,7 @@ interface AppStateType {
   currentProviderKey: string | null;
   manualProviderKey: LyricSourceKey | null;
   availableProviderKeys: LyricSourceKey[];
+  availableUnisonLyricsId: number | null;
   isControlsDockEnabled: boolean;
   controlsDockPosition: string;
   isControlsDockAutoHideInFullscreenEnabled: boolean;
@@ -70,6 +72,8 @@ interface AppStateType {
   currentUnisonData: UnisonData | null;
   isPictureInPictureOpen: boolean;
   endTimeMode: "total" | "remaining";
+  playbackRate: number;
+  isKaraokeEnabled: boolean;
 }
 
 export const AppState: AppStateType = {
@@ -104,6 +108,7 @@ export const AppState: AppStateType = {
   currentProviderKey: null,
   manualProviderKey: null,
   availableProviderKeys: [],
+  availableUnisonLyricsId: null,
   isControlsDockEnabled: true,
   controlsDockPosition: DOCK_DEFAULT_POSITION,
   isControlsDockAutoHideInFullscreenEnabled: true,
@@ -117,6 +122,8 @@ export const AppState: AppStateType = {
   currentUnisonData: null,
   isPictureInPictureOpen: false,
   endTimeMode: "total",
+  playbackRate: 1,
+  ...KARAOKE_DEFAULTS,
 };
 
 export function reloadLyrics(): void {
@@ -127,6 +134,7 @@ export function reloadLyrics(): void {
 export async function refreshCurrentSong(): Promise<void> {
   const videoId = AppState.lastLoadedVideoId;
   AppState.availableProviderKeys = [];
+  AppState.availableUnisonLyricsId = null;
   if (videoId) {
     resetUnifiedStream(videoId);
     await clearSongCache(videoId);
@@ -139,6 +147,7 @@ export function handleModifications(detail: PlayerDetails): void {
     AppState.lyricOffset = 0;
     AppState.manualProviderKey = null;
     AppState.availableProviderKeys = [];
+    AppState.availableUnisonLyricsId = null;
   }
 
   if (AppState.lyricInjectionPromise) {

@@ -7,15 +7,17 @@ import {
   LYRICS_DISABLED_ATTR,
   SMOOTH_PROGRESS_BAR_STYLE_ID,
 } from "@constants";
-import { AppState, reloadLyrics } from "@core/appState";
-import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
+import { AppState, refreshCurrentSong, reloadLyrics } from "@core/appState";
+import { compileRicsToStyles, getStorage } from "@core/storage";
 import { configureLogging, logContent } from "@core/logger";
+import { syncKaraoke } from "@modules/karaoke/karaokeView";
+import { loadKaraokeSettings } from "@modules/karaoke/settings";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
 import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
-import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -42,6 +44,7 @@ export function handleSettings(): void {
         layout.setAttribute(LYRICS_DISABLED_ATTR, "");
         playerPage.setAttribute(LYRICS_DISABLED_ATTR, "");
       }
+      syncKaraoke();
     },
     () => {
       const layout = document.getElementById("layout");
@@ -51,6 +54,7 @@ export function handleSettings(): void {
         layout.removeAttribute(LYRICS_DISABLED_ATTR);
         playerPage.removeAttribute(LYRICS_DISABLED_ATTR);
       }
+      syncKaraoke();
     }
   );
 
@@ -283,6 +287,7 @@ export function listenForPopupMessages(): void {
       loadTranslationSettings();
       loadLyricOffsetSettings();
       loadPassiveScrollSetting();
+      loadKaraokeSettings(syncKaraoke);
       loadDockSettings(() => {
         syncDock();
         hideDockOnIdleInFullscreen();
@@ -300,15 +305,18 @@ export function listenForPopupMessages(): void {
       );
       getAndApplyCustomStyles();
       reloadLyrics();
-    } else if (request.action === "clearCache") {
-      try {
-        clearCache();
-        reloadLyrics();
-
-        sendResponse({ success: true });
-      } catch {
-        sendResponse({ success: false });
-      }
+    } else if (request.action === "reloadLyrics") {
+      reloadLyrics();
+      sendResponse({ success: true });
+    } else if (request.action === "refreshLyrics") {
+      refreshCurrentSong().then(
+        () => sendResponse({ success: true }),
+        error => {
+          logContent("refreshLyrics failed:", error);
+          sendResponse({ success: false });
+        }
+      );
+      return true;
     }
   });
 }
@@ -318,7 +326,7 @@ export function loadPassiveScrollSetting(): void {
     AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
     // The side panel reads this off AppState every tick. The floating window only sees the copy
     // that rode over on the last payload, so a change reaches it on a republish or not at all.
-    publishPictureInPictureLyrics();
+    publishSecondaryViews();
   });
 }
 

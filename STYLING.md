@@ -68,10 +68,22 @@
 		- [Structure](#structure)
 		- [Control Buttons](#control-buttons)
 		- [Progress Bar](#progress-bar)
+		- [Volume](#volume)
 		- [Hiding the Controls](#hiding-the-controls)
 	- [21. Best Practices for Modifying CSS](#21-best-practices-for-modifying-css)
 	- [22. Importing/Exporting Styles](#22-importingexporting-styles)
 	- [23. Additional Resources](#23-additional-resources)
+	- [24. Karaoke Subtitles](#24-karaoke-subtitles)
+		- [Karaoke Structure](#karaoke-structure)
+		- [Styling the Plate](#styling-the-plate)
+		- [Bars Around the Video](#bars-around-the-video)
+		- [Stage Lines](#stage-lines)
+	- [25. Floating Window Music Video](#25-floating-window-music-video)
+		- [Window States](#window-states)
+		- [Video Elements](#video-elements)
+		- [Karaoke Stage in the Window](#karaoke-stage-in-the-window)
+		- [Ad Intermission](#ad-intermission)
+		- [Window Controls](#window-controls)
 
 ## 1. Introduction to CSS and Better Lyrics
 
@@ -438,6 +450,47 @@ This keeps lyrics centered everywhere except the Picture-in-Picture window:
 /* blyrics-target-scroll-pos-ratio = 0.5; */
 .blyrics-pip-shell .blyrics-container {
   --blyrics-target-scroll-pos-ratio: 0.37;
+}
+```
+
+The Picture-in-Picture window also defaults `--blyrics-scroll-timing-offset` to `0s`, so a line stays put until its last syllable ends instead of moving up half a second early inside the short window. A value set on `:root` doesn't reach it; to change it, set the variable on the same selector:
+
+```css
+.blyrics-pip-shell .blyrics-container {
+  --blyrics-scroll-timing-offset: 0.2s;
+}
+```
+
+#### Switching lyrics in the Picture-in-Picture window
+
+When the Picture-in-Picture window gets a new set of lyrics (a new song, or a different source picked from the lyrics dock), the old lines fade out and the lines on screen rise into place one after another. Switching source within the same song keeps the old lyrics up, dimmed, while the next ones load, and the loader only appears if they take longer than 250ms. While they wait, the old lyrics have `data-held` on `.blyrics-pip-scroller`, so you can change how far they dim:
+
+```css
+.blyrics-pip-scroller[data-held] {
+  opacity: 0.5;
+}
+```
+
+The lines fading out are a short-lived copy marked `.blyrics-pip-lyrics__exit`, and `.blyrics-pip-lyrics` has `data-revealing` while lines are still rising. Each rising line ends at the opacity your theme gives it, and the blur is added on top of its own `filter`, so lines you dim or blur keep that look when the rise ends. With reduced motion on, both steps become a short fade. None of this applies to the side panel or fullscreen.
+
+You can retune the motion with these variables on `.blyrics-pip-lyrics`. They're read when a swap starts, so changing them mid-swap does nothing until the next one:
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `--blyrics-pip-lyrics-hold-delay` | `250ms` | How long old lyrics stay up, dimmed, before the loader replaces them |
+| `--blyrics-pip-lyrics-exit-duration` | `200ms` | Fade-out of the old lines (and fade-in of the loader) |
+| `--blyrics-pip-lyrics-reveal-duration` | `500ms` | How long each line takes to rise |
+| `--blyrics-pip-lyrics-reveal-delay` | `120ms` | Wait before the first line starts rising |
+| `--blyrics-pip-lyrics-reveal-stagger` | `40ms` | Gap between one line and the next |
+| `--blyrics-pip-lyrics-reveal-lines` | All on screen | Most lines that rise; the rest appear at once. `0` turns the rise off |
+| `--blyrics-pip-lyrics-reveal-distance` | `12px` | How far below its place a line starts |
+| `--blyrics-pip-lyrics-reveal-blur` | `3px` | Blur a line starts with |
+| `--blyrics-pip-lyrics-reveal-easing` | `cubic-bezier(0.22, 1, 0.36, 1)` | Easing for the rise |
+
+```css
+.blyrics-pip-lyrics {
+  --blyrics-pip-lyrics-reveal-stagger: 70ms;
+  --blyrics-pip-lyrics-reveal-blur: 0px;
 }
 ```
 
@@ -1642,9 +1695,11 @@ In fullscreen (audio) mode, Better Lyrics adds a column under the album art with
 ├── #blyrics-fs-info-row
 │   ├── #blyrics-song-info               (title, artist, album)
 │   └── .blyrics-fs-info-actions
+│       ├── .blyrics-volume              (see Volume)
 │       └── .blyrics-fs-more             (quick-actions trigger)
 └── #blyrics-fs-controls
     ├── .blyrics-progress                (seek bar and times)
+    │   └── .blyrics-progress__times
     └── .blyrics-fs-transport-slot
         ├── .blyrics-fs-like
         ├── previous / .blyrics-fs-play / next   (.blyrics-fs-disc)
@@ -1692,6 +1747,33 @@ The seek bar is `.blyrics-progress`. The filled portion is `.blyrics-progress__f
   opacity: 0.7;
 }
 ```
+
+### Volume
+
+The speaker icon is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. In fullscreen it sits left of the quick-actions button, in `.blyrics-fs-info-actions`, and stays usable during ads. In the floating window it sits on the artwork overlay, in the bottom-right corner across from the like button (`.blyrics-pip-artwork__control--like`), and shows with the other artwork controls. Over the music video it sits at the end of the transport row instead and opens to the right.
+
+| Hook | Meaning |
+|------|---------|
+| `.blyrics-volume[data-open]` | The slider is showing |
+| `.blyrics-volume[data-muted]` | Sound is muted |
+| `.blyrics-volume[data-level]` | `high`, `low` or `muted` |
+| `.blyrics-volume__button` / `.blyrics-volume__icon` | Speaker button and its icon |
+| `.blyrics-volume__icon [data-part]` | Icon parts that fade in and out: `wave-low`, `wave-high`, `mute` |
+| `.blyrics-volume__bar` / `__fill` / `__knob` | Slider track, fill and handle |
+
+Variables on `.blyrics-volume`:
+
+```css
+.blyrics-volume {
+  --blyrics-volume-width: 96px;        /* slider length when open */
+  --blyrics-volume-rest-opacity: 0.6;  /* speaker opacity while closed, default 0.4 */
+  --blyrics-volume-knob-size: 10px;    /* handle diameter, default 8px */
+}
+```
+
+Better Lyrics sets `--blyrics-volume-level` (0 to 1) whenever the volume changes. Read it, but don't set it.
+
+Dim the speaker with `opacity`, not a translucent `color`. The icon has overlapping fill and stroke, so a translucent colour shows a lighter outline.
 
 ### Hiding the Controls
 
@@ -1749,3 +1831,262 @@ To learn more about CSS and web development:
 - [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
 The best way to learn CSS is through experimentation and practice. Join the [Better Lyrics Discord community](https://discord.gg/UsHE3d5fWF) for help, inspiration, and to share your creations!
+
+## 24. Karaoke Subtitles
+
+When the "Karaoke subtitles" option is on (it is on by default) and a music video plays in fullscreen, the video fills the screen and the synced lyrics show over it one line at a time, on a blurred plate. The Better Lyrics side panel and the fullscreen controls column stay hidden for as long as karaoke owns the fullscreen video, including while lyrics load and when a song has no lyrics or only unsynced ones.
+
+While karaoke owns the layout, `ytmusic-app-layout` and `#player-page` carry the `blyrics-karaoke` attribute. The fullscreen rules from [section 10](#10-implementing-fullscreen-mode) skip it with `:not([blyrics-karaoke])`, so use the attribute when a fullscreen rule of yours should also skip karaoke:
+
+```css
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #blyrics-watermark {
+  display: none;
+}
+```
+
+### Karaoke Structure
+
+The overlay is a fixed layer added to the page the first time karaoke is used. The lyrics inside it are the normal `.blyrics-container`, laid out as a stage:
+
+```
+#blyrics-karaoke                                   ([data-bar], [data-title-card])
+├── .blyrics-karaoke__stage
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface   ([data-plate] when shown)
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface
+│   └── .blyrics-karaoke__mount
+│       └── .blyrics-container[data-layout="stage"]
+│           ├── .blyrics--line                     (one per lyric line)
+│           └── .blyrics-credits                   (end card)
+│               └── .blyrics-karaoke-source        (provider name and sync icon)
+└── .blyrics-karaoke__title
+    └── .blyrics-karaoke__card.blyrics-karaoke-surface
+        ├── .blyrics-karaoke__card-title
+        ├── .blyrics-karaoke__card-artist
+        └── .blyrics-karaoke__card-credit
+```
+
+There are two plates so that when the next line is somewhere else on screen, a new plate can fade in there while the old one fades out. The title card shows the song, artist and songwriters during an intro, when the first sung line is at least five seconds in.
+
+| Attribute | When applied |
+|-----------|--------------|
+| `#blyrics-karaoke[data-bar]` | The YouTube Music player bar is showing; the lines lift above it |
+| `#blyrics-karaoke[data-title-card]` | The intro title card is showing; the stage is hidden |
+| `#blyrics-karaoke[data-card]` | A card is showing: `title` for the intro title card, `end` for the end card. Absent while sung lines show |
+| `.blyrics-karaoke__plate[data-plate]` | This plate is behind the line being sung |
+| `.blyrics-karaoke__plate[data-end-card]` | This plate is behind the end card (songwriter credits and source); it keeps the attribute while it fades out |
+
+### Styling the Plate
+
+Both plates and the title card share `.blyrics-karaoke-surface`, so one rule restyles the whole backdrop. `--blyrics-karaoke-video-scale` shrinks the video and the overlay together relative to the screen. It is a unitless number and defaults to `1`. Below `1`, the frame takes the video's own aspect ratio, so a 4:3 or ultrawide video never shows black bars inside it:
+
+```css
+:root {
+  --blyrics-karaoke-video-scale: 0.94;
+}
+
+#blyrics-karaoke .blyrics-karaoke-surface {
+  border-radius: 0.3em;
+  background: rgb(0 0 0 / 70%);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+```
+
+Each backdrop can also be styled on its own: the intro card is `.blyrics-karaoke__card`, the plate behind sung lines is `.blyrics-karaoke__plate:not([data-end-card])`, and the plate behind the end card is `.blyrics-karaoke__plate[data-end-card]`:
+
+```css
+#blyrics-karaoke .blyrics-karaoke__card {
+  background: rgb(0 0 0 / 55%);
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate:not([data-end-card]) {
+  background: rgb(0 0 0 / 70%);
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate[data-end-card] {
+  background: rgb(20 20 40 / 80%);
+}
+```
+
+The plate's size and corners come from five variables. Set them on `#blyrics-karaoke` or any parent. Any unit works: `em` follows the lyric size, `rem` and `px` stay fixed. The plate grows around the text by its padding, and the lines are clipped to the same corners.
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `--blyrics-karaoke-plate-padding-block` | `0.18em` | Space above and below a sung line |
+| `--blyrics-karaoke-plate-padding-inline` | `0.55em` | Space left and right of a sung line |
+| `--blyrics-karaoke-card-padding-block` | `0.36em` | Space above and below the end card |
+| `--blyrics-karaoke-card-padding-inline` | `0.8em` | Space left and right of the end card |
+| `--blyrics-karaoke-plate-radius` | `0.46em` | Corner radius of both plates and the intro title card |
+
+```css
+#blyrics-karaoke {
+  --blyrics-karaoke-plate-padding-block: 0.3em;
+  --blyrics-karaoke-plate-radius: 0.6em;
+}
+```
+
+The lyric size comes from `--blyrics-font-size`, the same as everywhere else. Line scaling is turned off inside karaoke: `--blyrics-scale` and `--blyrics-active-scale` are forced to `1` on `#blyrics-karaoke .blyrics-container`, so sung and waiting lines keep the same size.
+
+### Bars Around the Video
+
+When a video's shape doesn't match the screen, YouTube Music fills the leftover space with black bars. In karaoke those bars are transparent, so they show whatever is behind the player: your theme's background, or the album art backdrop if that option is on. The video keeps its full frame. To bring the black back:
+
+```css
+ytmusic-player-page[video-mode][blyrics-karaoke] :is(#player, .html5-video-player) {
+  background: #000 !important;
+}
+```
+
+### Stage Lines
+
+Style lines as you do in the scrolling view. Colors, fonts and animations carry over. The stage only decides where each line sits. The stage marks each line with extra attributes:
+
+| Attribute | Meaning |
+|-----------|---------|
+| `data-stage-role="current"` | The line being sung |
+| `data-stage-role="previous"` | The line that just finished |
+| `data-stage-role="queued"` | A line waiting its turn |
+| `data-stage-role="gone"` | A line that has left the stage |
+| `data-stage-visible` | The line is on screen; without it the line is `visibility: hidden` |
+| `.blyrics-container[data-stage-duet]` | The sung lines use both sides: `v1` lines sit on the left, `v2` and `v3` on the right, `v1000` stays centred. A song with one singer stays centred whichever voice it is |
+
+The stage fades lines in and out through `--blyrics-stage-opacity`, and it sets `opacity` from that property with `!important`. Do not set `opacity` on stage lines. It is overridden, so it cannot show a hidden line or hold one that is leaving.
+
+## 25. Floating Window Music Video
+
+With the "Show music video" option on, the floating lyrics window plays the music video in place of the album art. The video shows only while YouTube Music is in video mode. In song mode the window keeps the album art.
+
+If karaoke subtitles are also on and the song has synced lyrics, the window switches to a stage layout: the video fills the window and the lines play over it, as in fullscreen karaoke. Unsynced lyrics, or karaoke turned off, keep the normal layout with the video in the art slot.
+
+With the option on, ads are never mirrored. While one plays, the artwork and lyrics fade out and a countdown intermission takes their place.
+
+### Window States
+
+All three attributes sit on `.blyrics-pip-shell`:
+
+| Attribute | When applied |
+|-----------|--------------|
+| `[data-video="on"]` | The music video is playing in the window |
+| `[data-video="ad"]` | An ad is playing; the intermission shows instead of the artwork and lyrics |
+| `[data-video="off"]` | No video: the option is off, YouTube Music is in song mode, or there is no video yet |
+| `[data-layout="stage"]` | The karaoke stage is showing over the video |
+| `[data-instant]` | A switch between song and video is in progress. Transitions are off until the new content settles, so nothing animates from the old layout |
+
+`.blyrics-pip-artwork[data-video-face]` is set while the visible artwork face holds the video rather than the cover.
+
+### Video Elements
+
+| Selector | What it is |
+|----------|------------|
+| `.blyrics-pip-artwork__music-video` | The video on an artwork face. There is one per face, so the swap between cover and video uses the normal artwork transition |
+| `.blyrics-pip-stage` | Full-window layer behind the stage, shown with `[data-layout="stage"]` |
+| `.blyrics-pip-stage__video` | The video inside the stage layer |
+
+`--blyrics-pip-video-aspect` holds the video's own size as `W / H` (for example `1920 / 1080`). The extension sets it on `.blyrics-pip-shell` once the video reports its size. It is unset before that, and the window then falls back to `16 / 9`. Read it in your own rules; setting it does nothing, because the inline value wins.
+
+### Karaoke Stage in the Window
+
+The stage is a second `#blyrics-karaoke` overlay, built inside the floating window. It has the same structure, classes and attributes as [section 24](#24-karaoke-subtitles): the plates, `.blyrics-karaoke-surface`, the title card and the end card. Rules you write for `#blyrics-karaoke` apply to both. To change only the window, put `.blyrics-pip-shell` in front:
+
+```css
+.blyrics-pip-shell #blyrics-karaoke .blyrics-karaoke-surface {
+  background: rgb(0 0 0 / 55%);
+}
+```
+
+The window sets its own plate size on `.blyrics-pip-shell`: a `0.75rem` radius, `0.5rem` by `0.75rem` padding around a line, and `0.5rem` by `1rem` around the end card. They are in `rem` so the plate stays readable around the scaled down text. To change them in the window, set the same variables on `.blyrics-pip-shell[data-layout="stage"]` and use `rem` or `px`. The window reads them there to keep the lines clear of the progress row and the transport, so a value set only on `#blyrics-karaoke` or in `em` can let the plate run into the controls.
+
+```css
+.blyrics-pip-shell[data-layout="stage"] {
+  --blyrics-karaoke-plate-padding-block: 0.375rem;
+}
+```
+
+While a card shows, the window sets `data-stage-card` on `.blyrics-pip-shell` (`title` or `end`, the same as `data-card` on the overlay) and `--blyrics-pip-card-height`, the card's height in pixels. The transport uses them to stay above the card, and the header hides while the title card shows because the card repeats the title and artist. In stage windows 340px wide or less (not tall ones), the song and video pill also fades out during the title card so the transport fits beside the close button. Both are read-only.
+
+The window scales the karaoke text down to its size. The factor is `--blyrics-pip-karaoke-text-scale`, a unitless number the extension sets on `.blyrics-pip-shell` when the window resizes. Inside the stage, `--blyrics-font-size` and `--blyrics-translated-font-size` are your values multiplied by it, so set those as usual and the window keeps them in proportion. Treat the factor as read-only: the transport controls place themselves with it, so an override moves the text but not the controls.
+
+In a tall window (narrower than 4:5) the video sits at the top and the lines play in the space under it, with the plate background removed.
+
+### Ad Intermission
+
+```
+.blyrics-pip-intermission
+├── .blyrics-pip-intermission__row
+│   ├── .blyrics-pip-intermission__mark
+│   └── .blyrics-pip-intermission__label      ("Ad playing")
+├── .blyrics-pip-intermission__count
+│   └── .blyrics-pip-intermission__glyph      (one per character, [data-digit] on digits)
+├── .blyrics-pip-intermission__bar
+│   └── .blyrics-pip-intermission__fill       (drains through transform: scaleX)
+└── .blyrics-pip-intermission__next
+    ├── .blyrics-pip-intermission__thumb
+    └── span                                  ("Then <b>song</b>")
+```
+
+The intermission is always in the window and only shows under `.blyrics-pip-shell[data-video="ad"]`. The count, the bar and the next line are `hidden` when YouTube Music has no time or title for them. Each digit rolls in its own clip, and `[data-digit]` gives digits a fixed width so the countdown doesn't shift as it changes.
+
+```css
+.blyrics-pip-intermission__fill {
+  background: var(--blyrics-lyric-active-color);
+}
+```
+
+### Window Controls
+
+The hover controls on the artwork have a song and video toggle and a close button:
+
+| Selector | What it is |
+|----------|------------|
+| `.blyrics-pip-mode-toggle` | Song and video pill. It is `hidden` when YouTube Music offers no switch for the current track, and it is not shown in windows under 130px tall |
+| `.blyrics-pip-mode-toggle__option` | One option; the current one has `[aria-pressed="true"]` |
+| `.blyrics-pip-artwork__control--close` | Closes the window |
+| `.blyrics-pip-artwork__control--like` | Likes the song; `[data-active]` when liked |
+
+The control discs and the pill share two variables, set on `.blyrics-pip-artwork__controls`:
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `--blyrics-pip-control-tint` | `rgb(0 0 0 / 28%)` | Background behind each control and the pill |
+| `--blyrics-pip-control-backdrop` | `blur(8px)` | `backdrop-filter` behind each control and the pill |
+
+```css
+.blyrics-pip-artwork__controls {
+  --blyrics-pip-control-tint: rgb(255 255 255 / 12%);
+  --blyrics-pip-control-backdrop: blur(16px);
+}
+```
+
+`--blyrics-pip-control-size` sets the size of the previous and next buttons; play and pause is 1.25 times larger. It defaults to `36px`, or `44px` in tall windows, and is set on `.blyrics-pip-artwork`. The size stays the same when the window resizes. Instead, the artwork grows until the pill, the close button and the transport all fit inside it, at its own aspect ratio. In short windows the progress row under the artwork is hidden to make room. The karaoke stage sizes its own transport, so this variable only changes the normal layout.
+
+```css
+.blyrics-pip-artwork {
+  --blyrics-pip-control-size: 32px;
+}
+```
+
+The stage layout uses more `--blyrics-pip-*` variables to place the transport, the plate and the progress row (`-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`). They are internal. Each is derived from the others, so changing one can push the controls into the lines. The normal layout also has internal variables for its artwork minimum: `--blyrics-pip-artwork-aspect`, `-artwork-min-height`, `-artwork-min-width`, `-chrome-height` and `-transport-edge`.
+
+## Optional image highlights and HDR
+
+The renderer supports theme-provided image fills. They are disabled by default. A theme opts in
+with `/* blyrics-image-highlights = true; */` and supplies one CSS image URL through
+`--blyrics-highlight-image` on `.blyrics-container`. This works with SDR textures too; the
+renderer does not enable HDR or choose a brightness on its own.
+
+The bundled **HDR** theme supplies a gain-map JPEG only inside HDR-display and CSS-support
+queries. Select it in the theme picker to enable brighter lyrics, the instrumental note, and
+image-colored glow.
+`--dynamic-range` controls the display-dependent brightness ceiling (the default is 70% standard,
+30% no-limit). Glow follows the normal per-word duration, easing and blur radius settings, with
+`--blyrics-image-glow-opacity-from` and `--blyrics-image-glow-opacity-to` controlling its strength.
+
+The glow blurs a separate copy after its karaoke mask, preserving the sharp fill and leaving room
+at word edges without padding changes. Letter masks and motion share the renderer's clock.
+For fragmented long words and bidi-sensitive inline runs, a parallel text run keeps the halo
+aligned with every wrapped fragment. Joining-script and mixed-direction word groups use
+whole-word sweeps to preserve native text shaping. Forced colors retain system text
+colors. Missing note images fall back to the ordinary note fill.
+
+A display's HDR headroom and browser compositing affect the observed brightness. Screenshots
+can check animation and clipping, but cannot establish the monitor's emitted luminance.

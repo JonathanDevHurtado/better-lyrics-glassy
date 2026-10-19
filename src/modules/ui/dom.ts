@@ -1,5 +1,6 @@
 import {
   AD_PLAYING_ATTR,
+  ARTWORK_MIN_SIZE_PX,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
   DOCK_CLASS,
@@ -34,12 +35,14 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
+import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { measureWidth, type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
-import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { publishSecondaryViews } from "@modules/ui/secondaryViews";
+import { syncKaraoke } from "@modules/karaoke/karaokeView";
 import {
   createFullscreenControls,
   type FullscreenControlsHandle,
@@ -432,6 +435,7 @@ function disconnectLayoutAttrObserver(): void {
 
 function showPlayerBarOnDockHover(): void {
   dockHoverActive = true;
+  ensureLayoutAttrObserver();
   const layout = document.getElementById("layout");
   if (layout?.hasAttribute("player-fullscreened")) {
     layout.setAttribute("show-fullscreen-controls", "");
@@ -678,10 +682,13 @@ function isCursorNearBottom(event: MouseEvent): boolean {
 }
 
 function evaluateDockProximity(event: MouseEvent): void {
-  const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
-  if (!inner) return;
-
   const barNear = isCursorNearBottom(event);
+  const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
+  if (!inner) {
+    setPlayerBarShown(barNear);
+    return;
+  }
+
   const rect = inner.getBoundingClientRect();
   const dock = inner.parentElement as HTMLElement | null;
   const dockActive =
@@ -771,6 +778,14 @@ function removeDockProximityListener(): void {
   }
 }
 
+export function setupFullscreenPlayerBarReveal(): () => void {
+  ensureDockProximityListener();
+  return () => {
+    disconnectLayoutAttrObserver();
+    removeDockProximityListener();
+  };
+}
+
 // -- Dock entry/exit effect ----------------------------------------------
 // The dock's shared reveal: scale, blur, and fade, the same values the dock uses to hide and
 // reappear. Used for elements entering or leaving the dock, and for the control set swap (which
@@ -854,9 +869,6 @@ export function mountDock(position: string): void {
     inner.addEventListener("click", event => {
       (event.target as HTMLElement).closest("button")?.blur();
     });
-
-    ensureLayoutAttrObserver();
-    ensureDockProximityListener();
 
     dock.appendChild(inner);
     sidePanel.appendChild(dock);
@@ -952,8 +964,6 @@ export function unmountDock(): void {
   dockControlsSwapFinalize?.();
   unmountVotingSegment();
   hidePlayerBarOnDockLeave();
-  disconnectLayoutAttrObserver();
-  removeDockProximityListener();
   const dock = document.getElementsByClassName(DOCK_CLASS)[0];
   if (dock) dock.remove();
   document.querySelector("#side-panel")?.classList.remove(DOCK_HOST_CLASS);
@@ -1312,6 +1322,7 @@ export function setupAdObserver(): void {
     } else {
       hideAdOverlay();
     }
+    syncKaraoke();
   });
 
   adStateObserver.observe(playerBar, { attributes: true, attributeFilter: [AD_PLAYING_ATTR] });
@@ -1414,7 +1425,7 @@ function setBackgroundImage(src: string, delayMs = 1000): void {
 }
 
 function containerSizeFor(width: number): number {
-  return Math.round(Math.max(width, 544));
+  return Math.round(Math.max(width * window.devicePixelRatio, ARTWORK_MIN_SIZE_PX));
 }
 
 function getContainerSize(): number {
@@ -1745,7 +1756,7 @@ export function addNoLyricsButton(
     buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
   }
 
-  lyricsWrapper.appendChild(buttonContainer);
+  (document.getElementsByClassName(LYRICS_CLASS)[0] ?? lyricsWrapper).appendChild(buttonContainer);
 }
 
 function buildUnisonSubmitUrl(song: string, artist: string, album: string, duration: number, videoId: string): URL {
@@ -1785,10 +1796,15 @@ export async function injectHeadTags(): Promise<void> {
 
   for (const file of cssFiles) {
     const id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
-    if (document.getElementById(id)) continue;
+    const href = versionedStylesheetUrl(file);
+    const existing = document.getElementById(id);
+    if (existing) {
+      if (existing instanceof HTMLLinkElement && existing.href !== href) existing.href = href;
+      continue;
+    }
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = chrome.runtime.getURL(file);
+    link.href = href;
     link.id = id;
     document.head.appendChild(link);
   }
@@ -1840,7 +1856,7 @@ export function cleanup(): void {
   }
 
   clearLyrics();
-  publishPictureInPictureLyrics();
+  publishSecondaryViews();
 }
 
 /**
@@ -1944,12 +1960,12 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
 
-  const row = wrapSongInfoWithActions(document, songInfoWrapper);
-  row.id = "blyrics-fs-info-row";
-  row.dir = "auto";
-
   const controls = createFullscreenControls(document);
   controls.element.id = "blyrics-fs-controls";
+
+  const row = wrapSongInfoWithActions(document, songInfoWrapper, controls.volumeElement);
+  row.id = "blyrics-fs-info-row";
+  row.dir = "auto";
 
   const column = document.createElement("div");
   column.id = "blyrics-fs-column";
