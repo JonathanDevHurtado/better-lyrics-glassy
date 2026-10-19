@@ -27,7 +27,7 @@ import {
   enableLyricsTab,
   initializeLyrics,
   lyricReloader,
-  setUpAvButtonListener,
+  setUpVideoModeListener,
   setupAltHoverHandler,
   setupHomepageFullscreenHandler,
   setupWakeLockForFullscreen,
@@ -67,7 +67,7 @@ async function modify(): Promise<void> {
   setupAltHoverHandler();
   initProviders();
   setupFullscreenPlayerBarReveal();
-  setUpAvButtonListener();
+  setUpVideoModeListener();
   log(
     INITIALIZE_LOG,
     "background: rgba(10,11,12,1) ; color: rgba(214, 250, 214,1) ; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 1rem; "
