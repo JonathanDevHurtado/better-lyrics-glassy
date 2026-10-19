@@ -47,7 +47,7 @@ import {
   setExtraHeight,
 } from "@modules/ui/dom";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
-import { getRelativeBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
+import { findBestLanguageMatch, getRelativeBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
@@ -712,10 +712,10 @@ async function processBatchTranslationsAndRomanizations(
       let translationResult: string | null = null;
 
       const matchedLang =
-        item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
+        item.translations && findBestLanguageMatch(targetTranslationLang, Object.keys(item.translations));
       if (item.translations && matchedLang) {
         translationResult = item.translations[matchedLang];
-      } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+      } else if (item.translation && findBestLanguageMatch(targetTranslationLang, [item.translation.lang])) {
         translationResult = item.translation.text;
       } else {
         const cached = getTranslationFromCache(item.words, targetTranslationLang);
