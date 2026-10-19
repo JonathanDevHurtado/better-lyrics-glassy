@@ -107,3 +107,75 @@ Evaluation range: upstream `9b3496c..1b8dd13e` (~130 commits; verified current 2
 - **`2fe886ed` share relative time formatting**: refactor feeding the unison feature; this repo has its own `formatTimeAgo` in `store.ts`.
 - **i18n syncs (PR 909 + ~25 `chore(i18n)`)**: strings for unbackported features.
 - **Deps/bots/release/CI**: `66cda1d4`, `7d27af41`, `87e37ecb`, `a071d7a2`, `285ab03e` (release 3.0.0.2), `1b8dd13e` (auto-fix), `ad441650` (CI), merge commits.
+
+---
+
+## Batch 4
+
+Evaluation range: upstream `1b8dd13e..8c2f405d` (807 commits, merged as v3.0.0 into `dev` at `1224a0a6`), plus the two dev-only Electron fixes `92989194` and `1224a0a6`. Batch 3 ended at `1b8dd13e`, so there is no overlap.
+
+### Backported
+
+1. **Log and Treat Failed YT Lyrics Fetches as Missing (`83062ff8`, `5b73e67a`)** — adapted
+   - Wraps the `yt-lyrics` promise in a `.catch` that logs and resolves `null`, so the provider loop's existing `ytLyrics !== null` guard skips the match check instead of rejecting the whole fetch.
+   - Kept this engine's `log(LOG_PREFIX, ...)` / `processLyrics(lyrics, true, signal)` / `lyricsTimer` lines; dropped `document` and `retainParsedLyrics` (absent here).
+2. **Skip YT Match Check and YT Wait for Unison Hits (`c74f5e03`, `cc182ae6`)** — clean
+   - `videoId`-sourced hits no longer run the string-similarity check against YT lyrics.
+3. **Wrap No-Lyrics Actions in Narrow Panels (`02008338`)** — clean
+   - One `flex-wrap: wrap` line on `.blyrics-no-lyrics-button-container`.
+4. **Skip the Player-Bar Frost at the Default Background Blur (PR-1013: `8c2f405d`)** — clean
+   - Adds the `@container style(--blyrics-background-blur: 100px)` query to `public/css/ytmusic/general.css` and documents it in `STYLING-SKILL.md`.
+   - Kept this engine's existing `#layout[player-ui-state="PLAYER_PAGE_OPEN"]` / `[blyrics-stylized]` selectors; the container query only targets the player-page bar background, so a theme that changes the blur keeps the frost.
+5. **Remove 1px Video Edge and Hide Fullscreen Media Buttons (PR-995: `930149fa`)** — adapted
+   - `fullscreen.css`: transparent `.html5-video-player`, `object-fit: cover` + black background on `video.html5-main-video` in video mode, and `#song-media-window { visibility: hidden }` in fullscreen. Selectors rewritten as `:not([blyrics-dfs])` (no `[blyrics-karaoke]` in this engine); the existing DFS `object-fit: cover` on `#song-image`/`#thumbnail img` is untouched.
+   - `public/script.js`: aspect-ratio writes are deduped by comparing the current inline custom property before `setProperty`/`removeProperty`. The upstream explicit calls on resize/tick were not added because this engine already refreshes the variable from its `ResizeObserver`, the video `resize` listener, and the video-change branch of the tick.
+   - Local `TICK_MS` / `cachedDuration` / `cachedAudioTrackData` / `PAUSED_TICK_LIMIT` perf patch preserved.
+6. **Reveal the Fullscreen Player Bar When No Lyrics Are Found (`2b523125`)** — adapted
+   - `dom.ts`: `setupFullscreenPlayerBarReveal()` attaches the dock-proximity listener once; `evaluateDockProximity()` now calls `setPlayerBarShown(barNear)` when the dock is absent. Setup moved out of `mountDock()` and teardown removed from `unmountDock()`, so the bottom-hover reveal still works without lyrics/dock.
+   - Dropped the disposable cleanup closure: this engine's `index.ts` has no dispose path, so the function returns `void` and is called once from `modify()`. The now-unreachable `disconnectLayoutAttrObserver()` / `removeDockProximityListener()` helpers were deleted.
+7. **Follow the Actual Video-Mode Attribute (`f9b398fa`)** — adapted
+   - `observer.ts`: `setUpAvButtonListener()` → `setUpVideoModeListener()`, observing `#player-page[video-mode]` instead of `#av-id > ytmusic-av-toggle[is-video-playback-mode-selected]`, so album videos that leave the A/V preference off still render in video mode. Dropped the `syncKaraoke()` call (no karaoke module).
+8. **Request Artwork at Display Resolution with a 1440px Floor (`c38b11af`, `dff2c3d4`, `0f4aae2b`)** — adapted, squashed into one commit
+   - `ARTWORK_MIN_SIZE_PX = 1440` in `constants.ts`; `getContainerSize()` now returns `Math.max(width * devicePixelRatio, ARTWORK_MIN_SIZE_PX)` instead of the flat 544 floor. Upstream's `containerSizeFor()` helper does not exist here; the change is inlined in `getContainerSize()`.
+9. **Keep Traditional/Simplified Chinese Translations Apart (`e8fe8404`, `f4e21180`)** — adapted
+   - `utils.ts`: `findBestLanguageMatch()` compares exact tags first, then `Intl.Locale().maximize()` script, with a memo cache. `injectLyrics.ts`: the two translation match sites use it (`item.translations` keys and `item.translation.lang`); the script-vs-source check at `injectLyrics.ts:678` is left on `langCodesMatch`.
+   - Adds `src/core/utils.selfcheck.ts` with a `chrome.runtime` manifest stub + dynamic import (this engine's `constants.ts`/`storage.ts` module graph reads `chrome` at import time).
+10. **Guard Unsupported `chrome.windows` in the Auth Background (`92989194`)** — adapted (dev-only)
+    - `backgroundAuth.ts`: `closeAuthWindow()` uses optional chaining and replaces the three `chrome.windows.remove` sites; `openConsentPopup()` bails with a `console.warn(LOG_PREFIX_AUTH, ...)` when `chrome.windows.create` is absent; `chrome.windows.onRemoved` is optional-chained. `popupShell.ts` from the upstream commit does not exist here.
+11. **Create the Theme-Update Alarm on Background Start (`1224a0a6`)** — clean (dev-only)
+    - `src/options/background.ts`: `setupThemeUpdateAlarm()` runs at module bottom before `initBackgroundAuth()`, because Electron does not emit `onInstalled`/`onStartup`.
+
+### Skipped (deferred — portable only by reimplementation)
+
+- **Cache clearing with no music tab (`7d6de67b`, `928f6b81`, `d7b1821f`)**: this engine's `clearTransientLyrics()` uses `chrome.tabs.query`/`sendMessage` and returns early with `updateCacheInfo(null)`; needs a rewrite around `clearCache()`.
+- **Unison preview debounce (`92d1f8fc`)**: this engine has no `LYRICS_FILE_READING_EVENT`; reimplement later.
+- **Identity write serialization (`0c8b7e77`)**: this engine caches a plain `KeyIdentity` object, not a promise; no import-count/commit queue to hook.
+- **Editor load/save ordering (`72aa9060`, `249989f3`)**: editor core is class-based here; the `codeEditor.ts` split is absent.
+- **Provider pin per song (`eda1abfd`, `7b718398`, `aeb4c4e3`, `fcca3e3e`)**: needs a new `providerPin` module and storage contract.
+- **Stylized-Latin script fixes (`e678aca2`, `4278eee7`, `4e928078`)**: depend on the new `nonLatinScript` module.
+- **Chinese-script matching in the Unison picker/captions (`334a1b02`)**: depends on `options/unison/languages.ts`.
+
+### Skipped (not portable)
+
+- **WAAPI/Braccato engine**: `87d93c70fb2d5a3cc29ded8c629d0130cf2afeac` and descendants, `dc4f5305`, `42170935`, `83835c14`.
+- **Karaoke**: all `karaoke` commits (`91ae98f1`, `5bae810d`, `5c23fdc9`, `9fca4b03`, …).
+- **Picture-in-Picture**: `08cd1af3`, `1c5fd5b0`, `56f3ab20`, `b55bb805`, `692ce365`, …
+- **Video quality**: `59636b0d`, `b3698132`, `50a8db11`, `133d7703`, …
+- **3.0 options/popup redesign**: `039312a3` onward (design tokens, shared primitives, custom dropdowns, popup shell, update notice, About page).
+- **Unison revisions/editor/multi-language series**: `869a6b92`, `33ed4002`, `06178693`, `8892a78d`, revision diff UI, language-name module.
+- **Storage stats UI**: `087d6381`, `3d5fb1d3`, `509b94e4`, `02ea2ee2`, `315f8b6c`, `c662f743`, `7209aaeb`, `66414fc0` (this engine already listens to `local`/`cacheInfo`).
+- **HDR theme (`5cef0a5f`)**.
+- **`951d3e26`**: depends on `summarizeLyricCache`/`getStorageBreakdown`, absent here.
+- **`98b32986`**: `clearCache()` already removes only `blyrics_` keys and honours `PROTECTED_STORAGE_KEYS`.
+- **`75a31336`, `a94166be`**: no identity-backup/import internals here.
+- **`84851825`**: this engine's locale layout has `pt`, not `pt_BR`/`pt_PT`.
+- **`6c0bfd04`, `a2b249e9`**: depend on `core/extensionStylesheet.ts` and the PiP browser controller, both absent.
+- **`464b6631`**: this engine's footer hover uses `transform: none`, not the upstream scale rule, so the alignment fix does not apply.
+- **i18n syncs, dependency bumps, releases, CI, docs, auto-fix/bot commits**.
+
+### Batch 4 verification
+
+- `npm run typecheck` — passed (2026-10-19).
+- `npx tsx src/core/constants.selfcheck.ts`, `providerList.selfcheck.ts`, `themeBuildResolver.selfcheck.ts`, `utils.selfcheck.ts` — all passed.
+- `npm run build:ci` — Vite build succeeded with no errors/warnings; the trailing sourcemap-upload step fails without `SOURCEMAPS_API_KEY` (environment-only, unrelated).
+- Manual QA matrix from the Batch 4 plan is still pending: YT fetch failure, Unison hit, ISRC autofill, narrow-panel wrap, frost skip, video edge, no-lyrics fullscreen bar, high-DPI artwork, zh-TW/zh-CN translations, Electron startup.
