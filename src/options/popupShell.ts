@@ -20,7 +20,13 @@ const POPUP_MIN_FIT_WIDTH_PX = 320;
 const POPUP_RESIZE_SETTLE_MS = 100;
 
 export function fitPopupToWindow(): void {
-  if (!chrome.extension.getViews({ type: "popup" }).includes(window)) return;
+  let views: Window[] = [];
+  try {
+    views = chrome.extension?.getViews?.({ type: "popup" }) ?? [];
+  } catch {
+    return;
+  }
+  if (!views.includes(window)) return;
   const root = document.documentElement;
   const fit = (): void => {
     const pinned = parseFloat(getComputedStyle(root).getPropertyValue("--popup-width"));
