@@ -1374,7 +1374,8 @@ function setBackgroundImage(src: string, delayMs = 1000): void {
 }
 
 function getContainerSize(): number {
-  return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
+  const width = document.getElementById("thumbnail")?.getBoundingClientRect().width || 0;
+  return Math.round(Math.max(width * window.devicePixelRatio, 1500));
 }
 
 function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
