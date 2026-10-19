@@ -1,5 +1,6 @@
 import {
   AD_PLAYING_ATTR,
+  ARTWORK_MIN_SIZE_PX,
   BACKGROUND_LYRIC_CLASS,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
@@ -1375,7 +1376,7 @@ function setBackgroundImage(src: string, delayMs = 1000): void {
 
 function getContainerSize(): number {
   const width = document.getElementById("thumbnail")?.getBoundingClientRect().width || 0;
-  return Math.round(Math.max(width * window.devicePixelRatio, 1440));
+  return Math.round(Math.max(width * window.devicePixelRatio, ARTWORK_MIN_SIZE_PX));
 }
 
 function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
