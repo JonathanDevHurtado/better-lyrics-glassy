@@ -494,6 +494,43 @@ function autoDetectLanguage(): void {
   if (matched) submitLanguageSelect.value = matched;
 }
 
+const ttmlMetaParser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true });
+
+function findIsrcMeta(node: unknown): string | null {
+  if (!node || typeof node !== "object") return null;
+  for (const [key, child] of Object.entries(node)) {
+    if (key === "meta") {
+      for (const meta of [child].flat()) {
+        if (String(meta?.["@_key"]).toLowerCase() !== "isrc") continue;
+        const value = String(meta["@_value"] ?? "")
+          .toUpperCase()
+          .replace(/[\s-]/g, "");
+        if (/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(value)) return value;
+      }
+    }
+    const found = findIsrcMeta(child);
+    if (found) return found;
+  }
+  return null;
+}
+
+function detectTtmlIsrc(text: string): string | null {
+  if (!/isrc/i.test(text)) return null;
+  try {
+    return findIsrcMeta(ttmlMetaParser.parse(text));
+  } catch (error) {
+    console.warn(LOG_PREFIX_UNISON, "Failed to read TTML metadata", error);
+    return null;
+  }
+}
+
+function autoDetectIsrc(): void {
+  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
+  if (isrcInput.value.trim()) return;
+  const isrc = detectTtmlIsrc(lyricsTextarea.value);
+  if (isrc) isrcInput.value = isrc;
+}
+
 function onFilterChange(): void {
   const cache = feedTabCache[activeFeedTab];
   cache.requestId++;
@@ -1342,6 +1379,7 @@ function setupSubmitForm(): void {
     updatePreview();
     autoDetectFormat();
     autoDetectLanguage();
+    autoDetectIsrc();
   });
 
   lyricsTextarea.addEventListener("dragover", (e: DragEvent) => {
@@ -1370,6 +1408,7 @@ function setupSubmitForm(): void {
       updatePreview();
       autoDetectFormat();
       autoDetectLanguage();
+      autoDetectIsrc();
     };
     reader.readAsText(file);
   });
