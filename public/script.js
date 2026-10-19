@@ -37,13 +37,14 @@ let observedVideoElement = null;
  * @param {HTMLVideoElement | null} video
  */
 const updateVideoAspectRatioVar = video => {
+  const style = document.documentElement.style;
   if (video && video.videoWidth > 0 && video.videoHeight > 0) {
-    document.documentElement.style.setProperty(
-      "--blyrics-video-aspect-ratio",
-      `${video.videoWidth} / ${video.videoHeight}`
-    );
-  } else {
-    document.documentElement.style.removeProperty("--blyrics-video-aspect-ratio");
+    const ratio = `${video.videoWidth} / ${video.videoHeight}`;
+    if (style.getPropertyValue("--blyrics-video-aspect-ratio") !== ratio) {
+      style.setProperty("--blyrics-video-aspect-ratio", ratio);
+    }
+  } else if (style.getPropertyValue("--blyrics-video-aspect-ratio")) {
+    style.removeProperty("--blyrics-video-aspect-ratio");
   }
 };
 
