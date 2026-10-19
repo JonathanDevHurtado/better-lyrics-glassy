@@ -72,8 +72,12 @@ function resolveSlot(slot: PendingRequest, requestId: string, response: External
   }
 
   if (slot.windowId !== null) {
-    chrome.windows.remove(slot.windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+    closeAuthWindow(slot.windowId);
   }
+}
+
+function closeAuthWindow(windowId: number): void {
+  chrome.windows?.remove?.(windowId)?.catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
 }
 
 async function signFor(request: AuthRequest): Promise<ExternalResponse> {
@@ -87,6 +91,11 @@ async function signFor(request: AuthRequest): Promise<ExternalResponse> {
 }
 
 async function openConsentPopup(requestId: string, request: AuthRequest): Promise<number | null> {
+  if (!chrome.windows?.create) {
+    console.warn(LOG_PREFIX_AUTH, "chrome.windows unavailable; cannot open consent popup");
+    return null;
+  }
+
   const url = new URL(chrome.runtime.getURL("pages/auth.html"));
   url.searchParams.set("requestId", requestId);
   url.searchParams.set("nonce", request.nonce);
@@ -178,7 +187,7 @@ export function initBackgroundAuth(): void {
           return;
         }
         if (!siteConnected) {
-          chrome.windows.remove(windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+          closeAuthWindow(windowId);
           return;
         }
 
@@ -201,9 +210,7 @@ export function initBackgroundAuth(): void {
           pending.delete(requestId);
           slot.popupPort?.disconnect();
           if (slot.windowId !== null) {
-            chrome.windows
-              .remove(slot.windowId)
-              .catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+            closeAuthWindow(slot.windowId);
           }
           return;
         }
@@ -235,7 +242,7 @@ export function initBackgroundAuth(): void {
     });
   });
 
-  chrome.windows.onRemoved.addListener(closedWindowId => {
+  chrome.windows?.onRemoved?.addListener(closedWindowId => {
     for (const [requestId, slot] of pending) {
       if (slot.windowId === closedWindowId && !slot.resolved) {
         slot.windowId = null;
