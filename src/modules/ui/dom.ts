@@ -437,13 +437,9 @@ function ensureLayoutAttrObserver(): void {
   layoutAttrObserver.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
 }
 
-function disconnectLayoutAttrObserver(): void {
-  layoutAttrObserver?.disconnect();
-  layoutAttrObserver = null;
-}
-
 function showPlayerBarOnDockHover(): void {
   dockHoverActive = true;
+  ensureLayoutAttrObserver();
   const layout = document.getElementById("layout");
   if (layout?.hasAttribute("player-fullscreened")) {
     layout.setAttribute("show-fullscreen-controls", "");
@@ -689,10 +685,13 @@ function isCursorNearBottom(event: MouseEvent): boolean {
 }
 
 function evaluateDockProximity(event: MouseEvent): void {
-  const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
-  if (!inner) return;
-
   const barNear = isCursorNearBottom(event);
+  const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
+  if (!inner) {
+    setPlayerBarShown(barNear);
+    return;
+  }
+
   const rect = inner.getBoundingClientRect();
   const dock = inner.parentElement as HTMLElement | null;
   const dockActive =
@@ -763,23 +762,8 @@ function ensureDockProximityListener(): void {
   document.addEventListener("mousemove", dockProximityListener, { passive: true });
 }
 
-function removeDockProximityListener(): void {
-  if (!dockProximityListener) return;
-  document.removeEventListener("mousemove", dockProximityListener);
-  dockProximityListener = null;
-  dockProximityAttached = false;
-  if (dockProximityRaf !== null) {
-    cancelAnimationFrame(dockProximityRaf);
-    dockProximityRaf = null;
-  }
-  if (dockLeaveTimer) {
-    clearTimeout(dockLeaveTimer);
-    dockLeaveTimer = null;
-  }
-  if (playerBarHideTimer) {
-    clearTimeout(playerBarHideTimer);
-    playerBarHideTimer = null;
-  }
+export function setupFullscreenPlayerBarReveal(): void {
+  ensureDockProximityListener();
 }
 
 // -- Dock entry/exit effect ----------------------------------------------
@@ -865,9 +849,6 @@ export function mountDock(position: string): void {
       (event.target as HTMLElement).closest("button")?.blur();
     });
 
-    ensureLayoutAttrObserver();
-    ensureDockProximityListener();
-
     dock.appendChild(inner);
     sidePanel.appendChild(dock);
     sidePanel.classList.add(DOCK_HOST_CLASS);
@@ -936,8 +917,6 @@ export function unmountDock(): void {
   dockControlsSwapFinalize?.();
   unmountVotingSegment();
   hidePlayerBarOnDockLeave();
-  disconnectLayoutAttrObserver();
-  removeDockProximityListener();
   const dock = document.getElementsByClassName(DOCK_CLASS)[0];
   if (dock) dock.remove();
   document.querySelector("#side-panel")?.classList.remove(DOCK_HOST_CLASS);

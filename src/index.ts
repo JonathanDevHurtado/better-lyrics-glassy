@@ -15,7 +15,13 @@ import {
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
-import { injectHeadTags, observeLyricsPageType, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
+import {
+  injectHeadTags,
+  observeLyricsPageType,
+  reloadAlbumArt,
+  setupAdObserver,
+  setupFullscreenPlayerBarReveal,
+} from "@modules/ui/dom";
 import {
   disableInertWhenFullscreen,
   enableLyricsTab,
@@ -60,6 +66,7 @@ async function modify(): Promise<void> {
   disableInertWhenFullscreen();
   setupAltHoverHandler();
   initProviders();
+  setupFullscreenPlayerBarReveal();
   setUpAvButtonListener();
   log(
     INITIALIZE_LOG,
