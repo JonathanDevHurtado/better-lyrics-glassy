@@ -203,27 +203,31 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     let ytLyricsEarlyInjectAbortController = new AbortController();
 
     const ytLyricsStart = performance.now();
-    let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
-      lyricsTimer.add("yt-lyrics", performance.now() - ytLyricsStart, true);
-      if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
-        if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
-          log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
-          let lyricsWithMeta = {
-            ...lyrics,
-            song: providerParameters.song,
-            artist: providerParameters.artist,
-            duration: providerParameters.duration,
-            videoId: providerParameters.videoId,
-            album: providerParameters.album || "",
-            segmentMap: null,
-          };
+    let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics")
+      .then(lyrics => {
+        lyricsTimer.add("yt-lyrics", performance.now() - ytLyricsStart, true);
+        if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
+          if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
+            log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
+            let lyricsWithMeta = {
+              ...lyrics,
+              song: providerParameters.song,
+              artist: providerParameters.artist,
+              duration: providerParameters.duration,
+              videoId: providerParameters.videoId,
+              album: providerParameters.album || "",
+              segmentMap: null,
+            };
 
-          processLyrics(lyricsWithMeta, true, signal);
+            processLyrics(lyricsWithMeta, true, signal);
+          }
         }
-      }
-      return lyrics;
-    });
-    ytLyricsPromise.catch(logCore);
+        return lyrics;
+      })
+      .catch(err => {
+        log(err);
+        return null;
+      });
 
     try {
       lyricsTimer.begin("provider:metadata");
