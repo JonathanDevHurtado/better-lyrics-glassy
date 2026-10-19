@@ -165,5 +165,7 @@ chrome.runtime.onMessage.addListener(request => {
   return true;
 });
 
+// Electron does not emit onInstalled/onStartup for unpacked extensions.
+setupThemeUpdateAlarm();
 initBackgroundAuth();
 initIdentityBackupWatcher(error => warnBackground("Identity backup watcher failed:", error));
