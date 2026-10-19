@@ -223,6 +223,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       }
       return lyrics;
     });
+    ytLyricsPromise.catch(logCore);
 
     try {
       lyricsTimer.begin("provider:metadata");
