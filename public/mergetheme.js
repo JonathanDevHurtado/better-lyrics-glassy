@@ -832,6 +832,21 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-video-mode]):not([video-mo
   max-width: var(--blyrics-img-max-width, 576px) !important;
 }
 
+/* Fullscreen video frame: the player page is viewport-sized, but the in-app-menu's
+   reserved --menu-bar-height still shifts the video in normal flow (~30px), while
+   the karaoke overlay is fixed to the viewport. Pin the video frame to the same
+   viewport coordinates as the overlay. Music fullscreen is untouched. */
+ytmusic-player-page[player-fullscreened][blyrics-karaoke][blyrics-video-mode] #player.ytmusic-player-page {
+  position: fixed !important;
+  top: var(--blyrics-karaoke-frame-y) !important;
+  left: var(--blyrics-karaoke-frame-x) !important;
+  width: var(--blyrics-karaoke-frame-width) !important;
+  height: var(--blyrics-karaoke-frame-height) !important;
+  max-height: var(--blyrics-karaoke-frame-height) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
 ytmusic-player-page {
   --yt-img-border-radius: 2rem;
 }
