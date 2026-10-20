@@ -901,26 +901,6 @@ body.options-page {
 #navbar .nav-container { gap: 6px; }
 
 #navbar .ui-button svg { width: 17px; height: 17px; }
-#navbar .ui-button[href*="x.com"] svg { width: 15px; height: 15px; }
-#navbar .discord-btn {
-  color: var(--text-strong);
-  background: #5865f2;
-  box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0 0, rgba(88, 101, 242, 0.35) 0 4px 12px -4px;
-  --button-icon: currentColor;
-  --button-icon-hover: currentColor;
-  transition:
-    background var(--duration-quick) ease-out,
-    box-shadow var(--duration-fast) var(--ease-smooth-out),
-    scale var(--duration-quick) ease-out;
-}
-#navbar .discord-btn:hover {
-  background: #4752c4;
-  box-shadow: inset rgba(255, 255, 255, 0.2) 0 1px 0 0, rgba(88, 101, 242, 0.55) 0 6px 18px -4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #navbar .discord-btn { transition: none; }
-}
 
 /* -- Tab strip ------------------------------------------------------------- */
 

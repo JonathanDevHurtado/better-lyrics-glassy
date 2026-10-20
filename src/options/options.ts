@@ -653,7 +653,8 @@ function initPopupScrollFades(): void {
 function syncFullscreenDependents(): void {
   const master = document.getElementById("isFullScreenDisabled") as HTMLInputElement | null;
   const dependents = document.querySelector("[data-fs-deps]");
-  const muted = master?.checked ?? false;
+  const masterHidden = master?.closest<HTMLElement>(".ui-row")?.style.display === "none";
+  const muted = (master?.checked ?? false) && !masterHidden;
   dependents?.toggleAttribute("data-muted", muted);
   dependents?.toggleAttribute("inert", muted);
 }
