@@ -56,10 +56,10 @@ let storedProgressBarEnabled: unknown = true;
 let storedVideoEnabled: unknown = true;
 let storedKaraokeEnabled: unknown = KARAOKE_DEFAULTS.isKaraokeEnabled;
 let storedWindowLayout: unknown = DEFAULT_WINDOW_LAYOUT;
-let isPictureInPictureEnabled = false;
+let isPictureInPictureEnabled = true;
 
 const PIP_SETTING_DEFAULTS = {
-  isPictureInPictureEnabled: false,
+  isPictureInPictureEnabled: true,
   isPictureInPictureAutoRestoreEnabled: false,
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,

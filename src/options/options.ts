@@ -365,7 +365,7 @@ const restoreOptions = (): void => {
     isSmoothProgressBarEnabled: false,
     letterWavePref: "on",
     isPassiveScrollEnabled: true,
-    isPictureInPictureEnabled: false,
+    isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
     pipWindowLayout: "horizontal",
     pipArtworkTransition: "shuffle",
@@ -406,7 +406,7 @@ const restoreOptions = (): void => {
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
     isDockRefreshEnabled: false,
-    isDockPictureInPictureEnabled: false,
+    isDockPictureInPictureEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
     richsyncOffsetTrim: 0,
@@ -1609,7 +1609,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = false;
-  (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = false;
+  (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
   syncUnisonModalDependentState(true);
