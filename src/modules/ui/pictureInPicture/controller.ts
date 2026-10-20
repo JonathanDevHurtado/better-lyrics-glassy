@@ -1,4 +1,5 @@
 import { getPictureInPictureCapability } from "@modules/ui/pictureInPicture/capability";
+import { requestScriptedWindow } from "@modules/ui/pictureInPicture/scriptedWindow";
 import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
@@ -28,7 +29,8 @@ export class PictureInPictureController<TWindow> {
   constructor(private readonly dependencies: PictureInPictureControllerDependencies<TWindow>) {}
 
   isSupported(): boolean {
-    return getPictureInPictureCapability<TWindow>(this.dependencies.host).kind === "supported";
+    const kind = getPictureInPictureCapability<TWindow>(this.dependencies.host).kind;
+    return kind === "supported" || kind === "scripted-window";
   }
 
   isOpen(): boolean {
@@ -52,7 +54,36 @@ export class PictureInPictureController<TWindow> {
 
   private open(): void {
     const capability = getPictureInPictureCapability<TWindow>(this.dependencies.host);
-    if (capability.kind === "supported") this.requestWindow(capability.api);
+    if (capability.kind === "supported") {
+      this.requestWindow(capability.api);
+    } else if (capability.kind === "scripted-window") {
+      this.openScriptedWindow();
+    }
+  }
+
+  private openScriptedWindow(): void {
+    this.isOpening = true;
+
+    let pipWindow: TWindow | null;
+    try {
+      // window.open must also stay in the click stack, for the same user-activation reason.
+      pipWindow = requestScriptedWindow(this.dependencies.windowSize()) as TWindow | null;
+    } catch (error) {
+      this.isOpening = false;
+      this.dependencies.reportFailure("Scripted Picture-in-Picture window failed", error);
+      return;
+    }
+
+    if (pipWindow === null) {
+      this.isOpening = false;
+      this.dependencies.reportFailure(
+        "Scripted Picture-in-Picture window was blocked",
+        new Error("window.open returned null")
+      );
+      return;
+    }
+
+    this.initialize(pipWindow);
   }
 
   private requestWindow(api: DocumentPictureInPicture<TWindow>): void {

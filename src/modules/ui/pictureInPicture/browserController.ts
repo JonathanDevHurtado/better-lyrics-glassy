@@ -10,6 +10,7 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
+import { getPictureInPictureCapability } from "@modules/ui/pictureInPicture/capability";
 import { onSignal, sendInit, sendMetadata } from "@modules/ui/pictureInPicture/bridge";
 import { createGatedToggle } from "@modules/ui/pictureInPicture/controller";
 import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
@@ -35,6 +36,7 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_adPlaying",
   "picture_in_picture_adUpNext",
   "unison_song",
+  "options_display_pipWindow",
   "options_display_videoTab",
   "ui_close",
 ] as const;
@@ -128,7 +130,14 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       videoEnabled: () => storedVideoEnabled,
       karaokeEnabled: () => storedKaraokeEnabled,
       windowLayout: () => storedWindowLayout,
-      windowTitle: () => t("picture_in_picture_open"),
+      // Keep the Electron window distinct from native browser PiP: window managers (and user
+      // rules such as Hyprland's keep_aspect_ratio) match native PiP windows by this title.
+      windowTitle: () =>
+        t(
+          getPictureInPictureCapability(window).kind === "scripted-window"
+            ? "options_display_pipWindow"
+            : "picture_in_picture_open"
+        ),
       stylesheetUrls: () => ({
         lyrics: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
         fonts: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],

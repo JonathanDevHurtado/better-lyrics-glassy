@@ -96,5 +96,6 @@ export interface PictureInPictureControllerDependencies<TWindow> {
 
 export type PictureInPictureCapability<TWindow = Window> =
   | { readonly kind: "supported"; readonly api: DocumentPictureInPicture<TWindow> }
+  | { readonly kind: "scripted-window" }
   | { readonly kind: "missing" }
   | { readonly kind: "malformed" };
