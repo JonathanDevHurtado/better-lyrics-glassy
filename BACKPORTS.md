@@ -178,4 +178,10 @@ Evaluation range: upstream `1b8dd13e..8c2f405d` (807 commits, merged as v3.0.0 i
 - `npm run typecheck` — passed (2026-10-19).
 - `npx tsx src/core/constants.selfcheck.ts`, `providerList.selfcheck.ts`, `themeBuildResolver.selfcheck.ts`, `utils.selfcheck.ts` — all passed.
 - `npm run build:ci` — Vite build succeeded with no errors/warnings; the trailing sourcemap-upload step fails without `SOURCEMAPS_API_KEY` (environment-only, unrelated).
-- Manual QA matrix from the Batch 4 plan is still pending: YT fetch failure, Unison hit, ISRC autofill, narrow-panel wrap, frost skip, video edge, no-lyrics fullscreen bar, high-DPI artwork, zh-TW/zh-CN translations, Electron startup.
+- Electron 42.5.0 / Chromium 148.0.7778.271 (`xvfb-run`, `session.extensions.loadExtension`):
+  - MV3 service worker registers and runs (the `chrome.windows` guards hold; `typeof chrome.windows === "undefined"`).
+  - `theme-update-check` alarm is present, so the background-start `setupThemeUpdateAlarm()` works without `onInstalled`/`onStartup`.
+  - `options_ui/page.html` and `pages/unison.html` load with no console errors; ISRC autofill produced `USABC1234567` from a TTML `<ttm:meta key="isrc">`.
+  - `@container style(--blyrics-background-blur: 100px)` and `Intl.Locale#maximize()` work.
+  - Live `music.youtube.com/watch` page: `#player-page` carries `video-mode`, the extension set `blyrics-video-mode`, and `#song-media-window` does not contain `video.html5-main-video` (so the fullscreen `visibility: hidden` rule cannot hide the video).
+- Manual QA matrix still pending: YT fetch failure, Unison hit, narrow-panel wrap, frost skip, video edge in fullscreen, no-lyrics fullscreen bar, high-DPI artwork, zh-TW/zh-CN translations.
