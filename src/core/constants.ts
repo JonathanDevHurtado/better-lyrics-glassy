@@ -425,40 +425,16 @@ interface ProviderConfig {
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  {
-    key: "unison-richsynced",
-    displayName: "Unison",
-    syncType: "syllable",
-    priority: 1,
-  },
   { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
-  {
-    key: "unison-wordsynced",
-    displayName: "Unison",
-    syncType: "word",
-    priority: 3,
-  },
   { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 4 },
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 5 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 6 },
-  {
-    key: "unison-synced",
-    displayName: "Unison",
-    syncType: "line",
-    priority: 7,
-  },
   { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 8 },
   { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 9 },
   { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 10 },
   { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 11 },
   { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 12 },
   { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 13 },
-  {
-    key: "unison-plain",
-    displayName: "Unison",
-    syncType: "unsynced",
-    priority: 14,
-  },
   { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 15 },
 ] as const;
 

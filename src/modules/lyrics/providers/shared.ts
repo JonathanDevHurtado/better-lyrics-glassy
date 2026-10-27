@@ -114,6 +114,17 @@ const defaultPreferredProviderList: LyricSourceKey[] = [...PROVIDER_CONFIGS]
   .sort((a, b) => a.priority - b.priority)
   .map(p => p.key) as LyricSourceKey[];
 
+// Ostinato: Unison sends a persistent key id plus song metadata to a third
+// party on every lyrics request. It is not opt-in in upstream Better Lyrics,
+// so the fork removes its keys even when an old preferredProviderList still
+// contains them.
+const DISABLED_PROVIDER_KEYS = new Set<string>([
+  "unison-richsynced",
+  "unison-wordsynced",
+  "unison-synced",
+  "unison-plain",
+]);
+
 function isLyricSourceKey(provider: string): provider is LyricSourceKey {
   return (LYRIC_SOURCE_KEYS as readonly string[]).includes(provider);
 }
@@ -131,7 +142,9 @@ export function initProviders(): void {
     const stored = preferredProviderList ?? [...defaultPreferredProviderList];
     const merged = mergePreferredProviders(stored, defaultPreferredProviderList);
 
-    const finalProviderList = merged.filter(isLyricSourceKey);
+    const finalProviderList = merged.filter(
+      (key): key is LyricSourceKey => isLyricSourceKey(key) && !DISABLED_PROVIDER_KEYS.has(key)
+    );
 
     log(PROVIDER_SWITCHED_LOG, finalProviderList);
     providerPriority = finalProviderList;

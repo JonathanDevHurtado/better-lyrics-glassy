@@ -262,20 +262,16 @@ const restoreOptions = (): void => {
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
-      "unison-richsynced",
       "binimum-richsynced",
-      "unison-wordsynced",
       "portato-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
-      "unison-synced",
       "binimum-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
-      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
@@ -349,20 +345,16 @@ const setOptionsInForm = (items: Options): void => {
 
   const defaultProviderOrder = [
     "bLyrics-richsynced",
-    "unison-richsynced",
     "binimum-richsynced",
-    "unison-wordsynced",
     "portato-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
-    "unison-synced",
     "binimum-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
-    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -393,10 +385,6 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     name: t("options_provider_musixmatch"),
     syncType: "line",
   },
-  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
-  "unison-wordsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "word" },
-  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
-  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": {
     name: t("options_provider_youtubeCaptions"),
     syncType: "line",
@@ -650,9 +638,6 @@ document.addEventListener("DOMContentLoaded", () => {
     openExtensionPage("pages/marketplace.html");
   });
 
-  document.getElementById("open-unison-btn")?.addEventListener("click", () => {
-    openExtensionPage("pages/unison.html");
-  });
 
   initIdentityUI();
   initNicknameModal();
